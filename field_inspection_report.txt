@@ -1,0 +1,50 @@
+=== SERIALIZED FIELD INSPECTION REPORT ===
+Time: 2/25/2026 11:02:06 AM
+
+===== [GameOverPanel] GameOverUI (InstanceID:66184) =====
+  _panel: SET -> "GameOverPanel" (GameObject)
+  _finalScoreText: SET -> "FinalScoreText" (TextMeshProUGUI)
+  _highScoreText: SET -> "HighScoreText" (TextMeshProUGUI)
+  _newHighScoreLabel: NULL (NOT WIRED)
+  _restartButton: SET -> "RestartBtn" (Button)
+  _mainMenuButton: SET -> "MainMenuBtn" (Button)
+  _onGameOver: SET -> "OnGameOver" (VoidEventChannel)
+  _onScoreChanged: SET -> "OnScoreChanged" (IntEventChannel)
+  _onGameRestart: SET -> "OnGameRestart" (VoidEventChannel)
+  _onLoadScene: SET -> "OnSceneTransition" (StringEventChannel)
+
+===== [PausePanel] PauseUI (InstanceID:66206) =====
+  _panel: SET -> "PausePanel" (GameObject)
+  _resumeButton: SET -> "Resume" (Button)
+  _restartButton: SET -> "RestartBtn" (Button)
+  _mainMenuButton: SET -> "MainMenuBtn" (Button)
+  _onGamePaused: SET -> "OnGamePaused" (VoidEventChannel)
+  _onGameRestart: SET -> "OnGameRestart" (VoidEventChannel)
+  _onLoadScene: SET -> "OnSceneTransition" (StringEventChannel)
+
+===== [HUDPanel] GameHUD (InstanceID:66390) =====
+  _scoreText: SET -> "ScoreText" (TextMeshProUGUI)
+  _highScoreText: NULL (NOT WIRED)
+  _toolNameText: SET -> "ToolText" (TextMeshProUGUI)
+  _toolIcon: NULL (NOT WIRED)
+  _onScoreChanged: SET -> "OnScoreChanged" (IntEventChannel)
+  _onMilestoneReached: SET -> "OnMilestoneReached" (IntEventChannel)
+  _onToolEquipped: SET -> "OnToolEquipped" (ToolDataEventChannel)
+  _milestoneText: NULL (NOT WIRED)
+  _milestoneDisplayDuration: float = 2
+
+===== [GameManager] GameManager (InstanceID:66398) =====
+  _currentState: enum = Main Menu (0)
+  _score: int = 0
+  _devMode: bool = False
+  _allTools: (Generic)
+  _firstPickupTool: SET -> "Hammer" (ToolData)
+  _onToolPickedUp: SET -> "OnToolPickedUp" (VoidEventChannel)
+  _onScoreChanged: SET -> "OnScoreChanged" (IntEventChannel)
+  _onMilestoneReached: SET -> "OnMilestoneReached" (IntEventChannel)
+  _onToolEquipped: SET -> "OnToolEquipped" (ToolDataEventChannel)
+  _onPlayerDied: SET -> "OnPlayerDied" (VoidEventChannel)
+  _onGameOver: SET -> "OnGameOver" (VoidEventChannel)
+  _onGamePaused: SET -> "OnGamePaused" (VoidEventChannel)
+  _onGameRestart: SET -> "OnGameRestart" (VoidEventChannel)
+

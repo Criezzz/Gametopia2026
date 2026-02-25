@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdf81379318c0d445b95c65416ae526b, type: 3}
+  m_Name: NailGun
+  m_EditorClassIdentifier: Assembly-CSharp::ToolData
+  toolName: Nail Gun
+  description: Rapid fire small nails.
+  toolType: 1
+  unlockScore: 10
+  baseWeight: 100
+  damage: 1
+  cooldown: 0.1
+  attackParam: 12
+  pierce: 0
+  knockback: 0.2
+  toolIcon: {fileID: 0}
+  toolSprite: {fileID: 0}
+  attackPrefab: {fileID: 0}
+  attackAnimator: {fileID: 0}
+  attackSFX: {fileID: 0}
