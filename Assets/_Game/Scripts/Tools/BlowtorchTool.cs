@@ -46,7 +46,7 @@ public class BlowtorchTool : BaseTool
         StartCooldown();
     }
 
-    private void OnDrawGizmos()
+    private void OnDrawGizmosSelected()
     {
         Gizmos.color = new Color(1f, 0.5f, 0f, 0.5f); // Orange half-transparent
         Vector2 origin = GetAttackOrigin();

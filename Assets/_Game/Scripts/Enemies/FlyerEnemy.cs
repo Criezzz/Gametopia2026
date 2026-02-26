@@ -22,9 +22,6 @@ public class FlyerEnemy : BaseEnemy
         if (_rb == null)
             _rb = GetComponent<Rigidbody2D>();
 
-        _rb.gravityScale = 0f; // Flyers don't fall
-        _rb.freezeRotation = true;
-
         // Random initial direction and phase
         _direction = Random.value > 0.5f ? 1 : -1;
         _timeOffset = Random.Range(0f, Mathf.PI * 2f);
@@ -79,6 +76,8 @@ public class FlyerEnemy : BaseEnemy
     /// </summary>
     private void OnCollisionStay2D(Collision2D collision)
     {
+        if (_isDead) return;
+
         var playerHealth = collision.gameObject.GetComponent<PlayerHealth>();
         if (playerHealth != null)
         {

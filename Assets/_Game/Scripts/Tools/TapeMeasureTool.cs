@@ -100,7 +100,7 @@ public class TapeMeasureTool : BaseTool
         _currentLength = 0f;
     }
 
-    private void OnDrawGizmos()
+    private void OnDrawGizmosSelected()
     {
         Gizmos.color = new Color(0f, 1f, 1f, 0.5f); // Cyan half-transparent
         Vector2 origin = (Vector2)transform.position;

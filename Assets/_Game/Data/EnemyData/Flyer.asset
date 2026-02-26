@@ -18,7 +18,7 @@ MonoBehaviour:
   moveSpeed: 2
   contactDamage: 1
   minScoreToSpawn: 0
-  respawnSpeedMultiplier: 1.5
+  respawnSpeedMultiplier: 2
   respawnTint: {r: 1, g: 0.5, b: 0.2, a: 1}
   enemySprite: {fileID: 0}
   animatorController: {fileID: 0}

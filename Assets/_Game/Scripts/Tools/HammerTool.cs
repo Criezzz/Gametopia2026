@@ -37,7 +37,7 @@ public class HammerTool : BaseTool
         Debug.Log($"[Hammer] Swing! Hit {hits.Length} enemies");
     }
 
-    private void OnDrawGizmos()
+    private void OnDrawGizmosSelected()
     {
         Gizmos.color = new Color(1f, 1f, 0f, 0.5f); // Yellow half-transparent
         Vector2 origin = GetAttackOrigin();

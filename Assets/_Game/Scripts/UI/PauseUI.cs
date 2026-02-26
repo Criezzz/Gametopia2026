@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 
@@ -28,7 +29,7 @@ public class PauseUI : MonoBehaviour
 
         _canvasGroup = _panel.GetComponent<CanvasGroup>();
         if (_canvasGroup == null)
-            Debug.LogWarning("[PauseUI] CanvasGroup is missing on pause panel. Using SetActive fallback.");
+            _canvasGroup = _panel.AddComponent<CanvasGroup>();
 
         SetPanelVisible(false);
     }
@@ -56,6 +57,10 @@ public class PauseUI : MonoBehaviour
 
     public void TogglePause()
     {
+        // Don't allow pausing during GameOver
+        if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameState.GameOver)
+            return;
+
         _isPaused = !_isPaused;
 
         SetPanelVisible(_isPaused);
@@ -64,16 +69,39 @@ public class PauseUI : MonoBehaviour
         _onGamePaused?.Raise();
     }
 
+    public void OnResumeClicked()
+    {
+        if (!_isPaused) return;
+        TogglePause();
+    }
+
     public void OnRestartClicked()
     {
+        SetPanelVisible(false);
+        _isPaused = false;
         Time.timeScale = 1f;
-        _onGameRestart?.Raise();
+
+        // Notify GameManager (optional cleanup), then always load directly
+        if (_onGameRestart != null && _onGameRestart.HasListeners)
+            _onGameRestart.Raise();
+
+        SceneManager.LoadScene("Game");
     }
 
     public void GoToMainMenu()
     {
+        SetPanelVisible(false);
+        _isPaused = false;
         Time.timeScale = 1f;
-        _onLoadScene?.Raise("MainMenu");
+
+        if (_onLoadScene != null && _onLoadScene.HasListeners)
+        {
+            _onLoadScene.Raise("MainMenu");
+        }
+        else
+        {
+            SceneManager.LoadScene("MainMenu");
+        }
     }
 
     private void SetPanelVisible(bool visible)

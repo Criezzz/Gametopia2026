@@ -1,10 +1,49 @@
 fileFormatVersion: 2
-guid: 2f7ee2b2be33f7e4884b4501a5efed53
+guid: 1c945d24ab88ef54c8edbd3dd1c5d472
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -5993692065582493870
-    second: Placeholder_Toolbox_0
+      213: -3077189328578352880
+    second: angry_robo_vfxt_0
+  - first:
+      213: -693306352457407227
+    second: angry_robo_vfxt_1
+  - first:
+      213: 3348625987830678519
+    second: angry_robo_vfxt_2
+  - first:
+      213: 4242103426907608045
+    second: angry_robo_vfxt_3
+  - first:
+      213: 8979034054041862165
+    second: angry_robo_vfxt_4
+  - first:
+      213: 7678944558365717262
+    second: angry_robo_vfxt_5
+  - first:
+      213: 2516303048655752196
+    second: angry_robo_vfxt_6
+  - first:
+      213: -8290549962269659118
+    second: angry_robo_vfxt_7
+  - first:
+      213: 6903461013723837378
+    second: angry_robo_vfxt_8
+  - first:
+      213: 4913899266012189627
+    second: angry_robo_vfxt_9
+  - first:
+      213: 9151826107344782537
+    second: angry_robo_vfxt_10
+  - first:
+      213: -3011385407271738069
+    second: angry_robo_vfxt_11
+  - first:
+      213: 1093281785364269793
+    second: angry_robo_vfxt_12
+  - first:
+      213: 1833607468373896658
+    second: angry_robo_vfxt_13
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -51,7 +90,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 16
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -75,7 +114,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 2
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -126,23 +165,89 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Placeholder_Toolbox_0
+      name: angry_robo_vfxt_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 12
-        height: 12
+        x: 39
+        y: 21
+        width: 18
+        height: 11
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 25fc0e182d022dca0800000000000000
-      internalID: -5993692065582493870
+      spriteID: 019e67bfb90ab45d0800000000000000
+      internalID: -3077189328578352880
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: angry_robo_vfxt_2
+      rect:
+        serializedVersion: 2
+        x: 68
+        y: 21
+        width: 24
+        height: 11
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7f30a4a1895b87e20800000000000000
+      internalID: 3348625987830678519
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: angry_robo_vfxt_5
+      rect:
+        serializedVersion: 2
+        x: 97
+        y: 21
+        width: 28
+        height: 11
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e03be4b1467119a60800000000000000
+      internalID: 7678944558365717262
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: angry_robo_vfxt_9
+      rect:
+        serializedVersion: 2
+        x: 131
+        y: 23
+        width: 26
+        height: 9
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bb395b4f85da13440800000000000000
+      internalID: 4913899266012189627
       vertices: []
       indices: 
       edges: []
@@ -151,7 +256,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 36f7346ad3d3c2d4193c401dd3ecd91f
     internalID: 0
     vertices: []
     indices: 
@@ -161,7 +266,20 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Placeholder_Toolbox_0: -5993692065582493870
+      angry_robo_vfxt_0: -3077189328578352880
+      angry_robo_vfxt_1: -693306352457407227
+      angry_robo_vfxt_10: 9151826107344782537
+      angry_robo_vfxt_11: -3011385407271738069
+      angry_robo_vfxt_12: 1093281785364269793
+      angry_robo_vfxt_13: 1833607468373896658
+      angry_robo_vfxt_2: 3348625987830678519
+      angry_robo_vfxt_3: 4242103426907608045
+      angry_robo_vfxt_4: 8979034054041862165
+      angry_robo_vfxt_5: 7678944558365717262
+      angry_robo_vfxt_6: 2516303048655752196
+      angry_robo_vfxt_7: -8290549962269659118
+      angry_robo_vfxt_8: 6903461013723837378
+      angry_robo_vfxt_9: 4913899266012189627
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

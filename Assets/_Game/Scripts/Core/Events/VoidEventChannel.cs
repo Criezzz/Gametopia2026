@@ -17,6 +17,8 @@ public class VoidEventChannel : ScriptableObject
     [SerializeField] private string _description;
 #endif
 
+    public bool HasListeners => _listeners.Count > 0;
+
     public void Register(Action listener)
     {
         if (listener != null)

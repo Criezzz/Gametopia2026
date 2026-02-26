@@ -45,7 +45,7 @@ public class ChainsawTool : BaseTool
         StartCooldown();
     }
 
-    private void OnDrawGizmos()
+    private void OnDrawGizmosSelected()
     {
         Gizmos.color = new Color(1f, 0f, 0f, 0.5f); // Red half-transparent
         Vector2 origin = GetAttackOrigin();

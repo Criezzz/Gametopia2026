@@ -1,25 +1,10 @@
 fileFormatVersion: 2
-guid: 544f5c758f24f784e95e75034da72cd0
+guid: 599d5fe1d06635f419be751e463e9d15
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 4301844918096825189
-    second: hammer_0
-  - first:
-      213: -6030043224269349317
-    second: hammer_1
-  - first:
-      213: -8258728375015105676
-    second: hammer_2
-  - first:
-      213: -1159298483449069950
-    second: hammer_3
-  - first:
-      213: 1784401183296663280
-    second: hammer_4
-  - first:
-      213: 1632725881280823895
-    second: hammer_5
+      213: -1163504838602118676
+    second: crate_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -141,89 +126,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: hammer_1
-      rect:
-        serializedVersion: 2
-        x: 34
-        y: 7
-        width: 22
-        height: 20
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 56b0bfd292933bb30800000000000000
-      internalID: 4301844918096825189
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: hammer_2
-      rect:
-        serializedVersion: 2
-        x: 66
-        y: 4
-        width: 23
-        height: 27
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: b3e9c25d2abf05ca0800000000000000
-      internalID: -6030043224269349317
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: hammer_0
+      name: crate_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 23
-        height: 15
+        width: 16
+        height: 16
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 28e7e59eb2859efe0800000000000000
-      internalID: -1159298483449069950
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: hammer_3
-      rect:
-        serializedVersion: 2
-        x: 95
-        y: 0
-        width: 28
-        height: 19
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 0fe2f2b0c6773c810800000000000000
-      internalID: 1784401183296663280
+      spriteID: ce92ca883866adfe0800000000000000
+      internalID: -1163504838602118676
       vertices: []
       indices: 
       edges: []
@@ -232,7 +151,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 52b4b637061e4794bbe10a2f049bacd5
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -242,11 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      hammer_0: -1159298483449069950
-      hammer_1: 4301844918096825189
-      hammer_2: -6030043224269349317
-      hammer_3: 1784401183296663280
-      hammer_5: 1632725881280823895
+      crate_0: -1163504838602118676
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

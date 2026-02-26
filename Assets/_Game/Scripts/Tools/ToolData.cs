@@ -46,6 +46,12 @@ public class ToolData : ScriptableObject
     public GameObject attackPrefab;    // Projectile, hitbox, or effect prefab
     public RuntimeAnimatorController attackAnimator;
 
+    [Header("Weapon Hold Position")]
+    [Tooltip("Horizontal distance from player center when held")]
+    public float weaponHoldDistance = 0f;
+    [Tooltip("Vertical offset from player center when held")]
+    public float weaponYOffset = 0f;
+
     [Header("Advanced Config")]
     [Tooltip("Optional per-tool behavior config (Magnet, Vacuum, etc.).")]
     public ToolBehaviorConfig behaviorConfig;

@@ -15,10 +15,11 @@ MonoBehaviour:
   enemyName: Walker
   moveType: 0
   maxHP: 8
-  moveSpeed: 2
+  moveSpeed: 4
   contactDamage: 1
+  gravityScale: 3.5
   minScoreToSpawn: 0
-  respawnSpeedMultiplier: 1.5
+  respawnSpeedMultiplier: 2
   respawnTint: {r: 1, g: 0.3, b: 0.3, a: 1}
-  enemySprite: {fileID: 0}
+  enemySprite: {fileID: -2185472608353246101, guid: 2d86e5be2585d084fa4d2d739de0ce15, type: 3}
   animatorController: {fileID: 0}

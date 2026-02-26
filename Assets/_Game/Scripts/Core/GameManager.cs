@@ -43,6 +43,10 @@ public class GameManager : MonoBehaviour
     private bool _hasAwardedFirstPickupTool;
     public ToolData CurrentTool => _currentTool;
 
+    [Header("Toolbox")]
+    [SerializeField] private Toolbox _toolboxPrefab;
+    private Toolbox _toolboxInstance;
+
     [Header("Event Channels")]
     [SerializeField] private VoidEventChannel _onToolPickedUp;
     [SerializeField] private IntEventChannel _onScoreChanged;
@@ -140,8 +144,27 @@ public class GameManager : MonoBehaviour
         SetState(GameState.Playing);
         Time.timeScale = 1f;
 
+        // Spawn toolbox at a random platform position
+        SpawnToolbox();
+
         _onScoreChanged?.Raise(_score);
         _onToolEquipped?.Raise(_currentTool);
+    }
+
+    private void SpawnToolbox()
+    {
+        if (_toolboxInstance != null)
+            Destroy(_toolboxInstance.gameObject);
+
+        if (_toolboxPrefab != null)
+        {
+            _toolboxInstance = Instantiate(_toolboxPrefab);
+            Debug.Log("[GameManager] Toolbox spawned at runtime.");
+        }
+        else
+        {
+            Debug.LogWarning("[GameManager] _toolboxPrefab is not assigned! Toolbox will not spawn.");
+        }
     }
 
     private void UpdateUnlockedTools(bool raiseMilestoneEvent)
@@ -218,6 +241,7 @@ public class GameManager : MonoBehaviour
     private void HandlePlayerDied()
     {
         SetState(GameState.GameOver);
+        Time.timeScale = 0f;
 
         // Update high score
         if (_score > HighScore)
@@ -246,13 +270,18 @@ public class GameManager : MonoBehaviour
 
     private void HandleGameRestart()
     {
-        StartGame();
+        // GameOverUI already calls SceneManager.LoadScene("Game") directly.
+        // This handler is for any additional cleanup GameManager needs to do before reload.
+        Time.timeScale = 1f;
+        SetState(GameState.MainMenu); // Reset state so OnSceneLoaded → StartGame() fires
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (scene.name == "Game" && _currentState != GameState.Playing)
             StartGame();
+        else if (scene.name == "MainMenu")
+            SetState(GameState.MainMenu);
     }
 
     private void DevEquipToolByIndex(int index)

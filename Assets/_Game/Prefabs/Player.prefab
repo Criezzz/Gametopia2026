@@ -316,7 +316,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDamping: 0
   m_AngularDamping: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 0
   m_Material: {fileID: 6200000, guid: 72bd24145814309468045f622edd0c95, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
@@ -326,8 +326,8 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 0
+  m_CollisionDetection: 1
+  m_Constraints: 4
 --- !u!61 &192692481984588974
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -413,10 +413,9 @@ MonoBehaviour:
   _weaponVisualRoot: {fileID: 7065063228493796851}
   _weaponSpriteRenderer: {fileID: 3322711771092581431}
   _weaponAnimator: {fileID: 8626824105392509231}
-  _weaponHoldDistance: 0.5
-  _weaponInset: 0.125
+  _weaponHoldDistance: 0
   _weaponYOffset: 0
-  _weaponSortingOrderOffset: 1
+  _weaponSortingOrderOffset: 3
 --- !u!114 &4691685812222822017
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -449,7 +448,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HammerTool
   _enemyLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 512
 --- !u!114 &3204064320672524423
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -478,7 +477,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TapeMeasureTool
   _enemyLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 512
   _extendSpeed: 16
 --- !u!114 &2644909439430470494
 MonoBehaviour:
@@ -508,7 +507,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BlowtorchTool
   _enemyLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 512
 --- !u!114 &7724356658002470167
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -523,7 +522,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VacuumTool
   _enemyLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 512
   _enemyProjectilePrefab: {fileID: 0}
   _suckDuration: 1
   _suckRange: 3
@@ -544,7 +543,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MagnetTool
   _enemyLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 512
   _beamWidth: 0.5
   _beamHeight: 2
   _beamLength: 50
@@ -563,7 +562,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ChainsawTool
   _enemyLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 512
 --- !u!95 &1931199702937931968
 Animator:
   serializedVersion: 7

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 
@@ -16,8 +17,16 @@ public class MainMenuUI : MonoBehaviour
     [Header("Event Channels")]
     [SerializeField] private StringEventChannel _onLoadScene;
 
+    private void Awake()
+    {
+        if (_playButton != null)
+            _playButton.onClick.AddListener(OnPlayClicked);
+    }
+
     private void Start()
     {
+        Time.timeScale = 1f;
+
         // Show high score
         int highScore = PlayerPrefs.GetInt("HighScore", 0);
         if (_highScoreText != null)
@@ -30,6 +39,14 @@ public class MainMenuUI : MonoBehaviour
 
     public void OnPlayClicked()
     {
-        _onLoadScene?.Raise("Game");
+        if (_onLoadScene != null && _onLoadScene.HasListeners)
+        {
+            _onLoadScene.Raise("Game");
+        }
+        else
+        {
+            Debug.Log("[MainMenuUI] No scene loader listeners — loading Game directly.");
+            SceneManager.LoadScene("Game");
+        }
     }
 }

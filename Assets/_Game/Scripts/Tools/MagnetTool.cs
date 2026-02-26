@@ -60,7 +60,7 @@ public class MagnetTool : BaseTool
         StartCooldown();
     }
 
-    private void OnDrawGizmos()
+    private void OnDrawGizmosSelected()
     {
         Gizmos.color = new Color(0.5f, 0f, 1f, 0.5f); // Purple half-transparent
         Vector2 origin = GetAttackOrigin();

@@ -28,10 +28,7 @@ public class PlayerToolHandler : MonoBehaviour
     [SerializeField] private Transform _weaponVisualRoot;
     [SerializeField] private SpriteRenderer _weaponSpriteRenderer;
     [SerializeField] private Animator _weaponAnimator;
-    [SerializeField] private float _weaponHoldDistance = 0.5f;
-    [SerializeField] private float _weaponInset = 0.125f; // 2 pixels at 16 PPU
-    [SerializeField] private float _weaponYOffset = 0f;
-    [SerializeField] private int _weaponSortingOrderOffset = 1;
+    [SerializeField] private int _weaponSortingOrderOffset = 3;
 
     private PlayerController _playerController;
     private BaseTool _currentTool;
@@ -39,6 +36,23 @@ public class PlayerToolHandler : MonoBehaviour
 
     public ToolData CurrentToolData => _currentToolData;
     private static readonly int AttackHash = Animator.StringToHash("Attack");
+
+    /// <summary>
+    /// Called by PlayerHealth when the player dies. Hides weapon and stops updates.
+    /// </summary>
+    public void OnPlayerDied()
+    {
+        if (_weaponSpriteRenderer != null) _weaponSpriteRenderer.enabled = false;
+        enabled = false;
+    }
+
+    /// <summary>
+    /// Called by PlayerHealth when the player resets (scene reload etc).
+    /// </summary>
+    public void OnPlayerReset()
+    {
+        enabled = true;
+    }
 
     private void Awake()
     {
@@ -173,6 +187,7 @@ public class PlayerToolHandler : MonoBehaviour
 
         _weaponAnimator.runtimeAnimatorController = data != null ? data.attackAnimator : null;
         _weaponAnimator.Rebind();
+        _weaponAnimator.ResetTrigger(AttackHash);
         _weaponAnimator.Update(0f);
     }
 
@@ -182,8 +197,10 @@ public class PlayerToolHandler : MonoBehaviour
             return;
 
         int facing = _playerController != null ? _playerController.FacingDirection : 1;
-        float x = facing * Mathf.Max(0f, _weaponHoldDistance - _weaponInset);
-        _weaponVisualRoot.localPosition = new Vector3(x, _weaponYOffset, 0f);
+        float holdDist = _currentToolData != null ? _currentToolData.weaponHoldDistance : 0f;
+        float yOffset = _currentToolData != null ? _currentToolData.weaponYOffset : 0f;
+        float x = facing * holdDist;
+        _weaponVisualRoot.localPosition = new Vector3(x, yOffset, 0f);
 
         if (_weaponSpriteRenderer != null)
             _weaponSpriteRenderer.flipX = facing < 0;

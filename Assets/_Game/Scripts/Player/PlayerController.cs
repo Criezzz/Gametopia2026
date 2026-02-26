@@ -24,6 +24,7 @@ public class PlayerController : MonoBehaviour
     private SpriteRenderer _spriteRenderer;
     private Animator _animator;
     private readonly RaycastHit2D[] _ceilingHits = new RaycastHit2D[8];
+    private readonly ContactPoint2D[] _groundContacts = new ContactPoint2D[8];
 
     // Animator params for movement state machine
     private static readonly int SpeedHash = Animator.StringToHash("Speed");
@@ -50,10 +51,6 @@ public class PlayerController : MonoBehaviour
         _boxCollider = GetComponent<BoxCollider2D>();
         _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         _animator = GetComponent<Animator>();
-
-        _rb.gravityScale = 0f; // We handle gravity manually
-        _rb.freezeRotation = true;
-        _rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 
         CacheJumpPhysics();
     }
@@ -143,8 +140,8 @@ public class PlayerController : MonoBehaviour
         if (_velocityY > 0f && IsTouchingCeiling())
             _velocityY = 0f;
 
-        // Ground snap
-        if (_isGrounded && _velocityY < 0f)
+        // Ground snap — only when physically resting on ground (not just raycast)
+        if (_velocityY < 0f && IsPhysicallyOnGround())
             _velocityY = 0f;
 
         _rb.linearVelocity = new Vector2(targetVelX, _velocityY);
@@ -206,6 +203,25 @@ public class PlayerController : MonoBehaviour
     private bool IsGroundHit(RaycastHit2D hit)
     {
         return hit.collider != null && hit.normal.y > 0.7f;
+    }
+
+    /// <summary>
+    /// Check actual physics contacts (not raycasts) for ground below.
+    /// Used for velocity snapping — more accurate than raycasts for position.
+    /// </summary>
+    private bool IsPhysicallyOnGround()
+    {
+        ContactFilter2D filter = new ContactFilter2D();
+        filter.useTriggers = false;
+        filter.SetLayerMask(ResolveGroundLayerMask());
+
+        int count = _rb.GetContacts(filter, _groundContacts);
+        for (int i = 0; i < count; i++)
+        {
+            if (_groundContacts[i].normal.y > 0.7f)
+                return true;
+        }
+        return false;
     }
 
     private bool IsTouchingCeiling()

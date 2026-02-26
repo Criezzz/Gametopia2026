@@ -1,10 +1,14 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
 /// Game Over screen. Shows final score, high score, and restart button.
 /// Listens to OnGameOver event to activate.
+/// Uses direct mouse/touch detection as primary input (bypasses EventSystem
+/// entirely for maximum reliability).
 /// </summary>
 public class GameOverUI : MonoBehaviour
 {
@@ -21,8 +25,15 @@ public class GameOverUI : MonoBehaviour
     [SerializeField] private IntEventChannel _onScoreChanged;
     [SerializeField] private VoidEventChannel _onGameRestart;
     [SerializeField] private StringEventChannel _onLoadScene;
+
     private CanvasGroup _canvasGroup;
     private int _latestScore;
+    private bool _isVisible;
+    private bool _isTransitioning;
+
+    // Cached RectTransforms for direct click detection
+    private RectTransform _restartRT;
+    private RectTransform _mainMenuRT;
 
     private void Awake()
     {
@@ -31,7 +42,19 @@ public class GameOverUI : MonoBehaviour
 
         _canvasGroup = _panel.GetComponent<CanvasGroup>();
         if (_canvasGroup == null)
-            Debug.LogWarning("[GameOverUI] CanvasGroup is missing on game over panel. Using SetActive fallback.");
+            _canvasGroup = _panel.AddComponent<CanvasGroup>();
+
+        // Cache RectTransforms for manual click detection
+        if (_restartButton != null)
+            _restartRT = _restartButton.GetComponent<RectTransform>();
+        if (_mainMenuButton != null)
+            _mainMenuRT = _mainMenuButton.GetComponent<RectTransform>();
+
+        // Wire button listeners as secondary mechanism (in case EventSystem works)
+        if (_restartButton != null)
+            _restartButton.onClick.AddListener(OnRestartClicked);
+        if (_mainMenuButton != null)
+            _mainMenuButton.onClick.AddListener(OnMainMenuClicked);
 
         SetPanelVisible(false);
     }
@@ -48,16 +71,14 @@ public class GameOverUI : MonoBehaviour
         if (_onScoreChanged != null) _onScoreChanged.Unregister(OnScoreChanged);
     }
 
-    private void Start()
-    {
-        SetPanelVisible(false);
-    }
-
     private void ShowGameOver()
     {
+        Debug.Log("[GameOverUI] ShowGameOver called!");
+        _isVisible = true;
+        _isTransitioning = false;
         SetPanelVisible(true);
 
-        Time.timeScale = 0f; // Pause game
+        Time.timeScale = 0f;
 
         int highScore = PlayerPrefs.GetInt("HighScore", 0);
 
@@ -69,6 +90,13 @@ public class GameOverUI : MonoBehaviour
 
         if (_newHighScoreLabel != null)
             _newHighScoreLabel.gameObject.SetActive(_latestScore >= highScore && _latestScore > 0);
+
+        // Force EventSystem to recognize the restart button (secondary mechanism)
+        if (_restartButton != null && EventSystem.current != null)
+        {
+            EventSystem.current.SetSelectedGameObject(null);
+            EventSystem.current.SetSelectedGameObject(_restartButton.gameObject);
+        }
     }
 
     private void OnScoreChanged(int score)
@@ -76,18 +104,94 @@ public class GameOverUI : MonoBehaviour
         _latestScore = score;
     }
 
-    public void OnRestartClicked()
+    private void Update()
     {
-        SetPanelVisible(false);
+        if (!_isVisible || _isTransitioning) return;
 
-        Time.timeScale = 1f;
-        _onGameRestart?.Raise();
+        // ===== PRIMARY: Direct mouse click detection (bypasses EventSystem) =====
+        if (Input.GetMouseButtonDown(0))
+        {
+            Vector2 mousePos = Input.mousePosition;
+
+            // Screen Space Overlay canvas: camera parameter = null
+            if (_restartRT != null &&
+                RectTransformUtility.RectangleContainsScreenPoint(_restartRT, mousePos, null))
+            {
+                Debug.Log("[GameOverUI] Direct click detected on RESTART.");
+                DoRestart();
+                return;
+            }
+
+            if (_mainMenuRT != null &&
+                RectTransformUtility.RectangleContainsScreenPoint(_mainMenuRT, mousePos, null))
+            {
+                Debug.Log("[GameOverUI] Direct click detected on MAIN MENU.");
+                DoMainMenu();
+                return;
+            }
+        }
+
+        // ===== SECONDARY: Keyboard shortcuts =====
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            DoRestart();
+        }
+        else if (Input.GetKeyDown(KeyCode.M))
+        {
+            DoMainMenu();
+        }
     }
 
+    /// <summary>
+    /// Called by Button.onClick (persistent or runtime). Kept as fallback.
+    /// </summary>
+    public void OnRestartClicked()
+    {
+        DoRestart();
+    }
+
+    /// <summary>
+    /// Called by Button.onClick (persistent or runtime). Kept as fallback.
+    /// </summary>
     public void OnMainMenuClicked()
     {
+        DoMainMenu();
+    }
+
+    private void DoRestart()
+    {
+        if (_isTransitioning) return;
+        _isTransitioning = true;
+        _isVisible = false;
+
+        Debug.Log("[GameOverUI] DoRestart — loading Game scene.");
+        SetPanelVisible(false);
         Time.timeScale = 1f;
-        _onLoadScene?.Raise("MainMenu");
+
+        if (_onGameRestart != null && _onGameRestart.HasListeners)
+            _onGameRestart.Raise();
+
+        SceneManager.LoadScene("Game");
+    }
+
+    private void DoMainMenu()
+    {
+        if (_isTransitioning) return;
+        _isTransitioning = true;
+        _isVisible = false;
+
+        Debug.Log("[GameOverUI] DoMainMenu — loading MainMenu scene.");
+        SetPanelVisible(false);
+        Time.timeScale = 1f;
+
+        if (_onLoadScene != null && _onLoadScene.HasListeners)
+        {
+            _onLoadScene.Raise("MainMenu");
+        }
+        else
+        {
+            SceneManager.LoadScene("MainMenu");
+        }
     }
 
     private void SetPanelVisible(bool visible)
