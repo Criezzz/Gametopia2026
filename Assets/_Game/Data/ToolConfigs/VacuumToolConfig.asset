@@ -17,3 +17,5 @@ MonoBehaviour:
   shootSpeed: 10
   shootDamage: 10
   shootInterval: 0.15
+  suckAnimDuration: 0.5
+  suckPullSpeed: 8

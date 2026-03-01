@@ -19,10 +19,12 @@ public class BaseEnemy : MonoBehaviour
     [SerializeField] private bool _isSmall = true; // Can be sucked by Vacuum
     public bool IsSmall => _isSmall;
     private bool _beingSucked;
+    private Coroutine _suckCoroutine;
 
     [Header("Event Channels")]
     [SerializeField] private VoidEventChannel _onEnemyKilled;
     [SerializeField] private EnemyFallChannel _onEnemyFell;
+    [SerializeField] private DeathDropChannel _onDeathDrop;
 
     [Header("Fall Detection")]
     [Tooltip("How far below the camera bottom before triggering fall respawn")]
@@ -31,40 +33,85 @@ public class BaseEnemy : MonoBehaviour
     [Header("Animation")]
     [Tooltip("Optional Animator for hit/death animations.")]
     [SerializeField] protected Animator _animator;
-    [SerializeField] private Color _hitFlashColor = Color.white;
-    [SerializeField] private float _hitFlashDuration = 0.1f;
+    [SerializeField] private Color _hitFlashColor = Color.black;
+    [SerializeField] private float _hitFlashDuration = 0.12f;
+    [SerializeField] private int _hitFlashCount = 2;
 
     [Header("Angry VFX")]
     [Tooltip("Child GameObject with SpriteRenderer + Animator for angry VFX. Disabled by default, enabled on MarkAsRespawned.")]
     [SerializeField] private GameObject _angryVFX;
 
+    private BoxCollider2D _boxCollider;
+
     protected SpriteRenderer _spriteRenderer;
     protected Rigidbody2D _rb;
     private Coroutine _flashCoroutine;
+    private int _maxHP; // Runtime max HP (for health bar ratio)
+    private EnemyHealthBar _healthBar;
 
     protected virtual void Awake()
     {
         _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         _rb = GetComponent<Rigidbody2D>();
+        _boxCollider = GetComponent<BoxCollider2D>();
+
+        // Auto-create health bar if not present on prefab
+        _healthBar = GetComponentInChildren<EnemyHealthBar>();
+        if (_healthBar == null)
+        {
+            GameObject hbObj = new GameObject("HealthBar");
+            hbObj.transform.SetParent(transform, false);
+            _healthBar = hbObj.AddComponent<EnemyHealthBar>();
+        }
     }
 
     protected virtual void Start()
     {
         if (_data != null)
         {
-            _currentHP = _data.maxHP;
+            _maxHP = _data.maxHP;
+            _currentHP = _maxHP;
         }
         else
         {
+            _maxHP = 1;
             _currentHP = 1;
         }
         _isDead = false;
+        UpdateHealthBar();
     }
 
     protected virtual void Update()
     {
-        if (_isDead) return;
+        if (_isDead || _beingSucked) return;
         CheckFallOffScreen();
+        CheckContactDamage();
+    }
+
+    /// <summary>
+    /// Overlap-based contact damage (player has 1 HP, so just check once per frame).
+    /// Works even though Player↔Enemy physics collision is disabled.
+    /// </summary>
+    private void CheckContactDamage()
+    {
+        if (_boxCollider == null) return;
+
+        Collider2D hit = Physics2D.OverlapBox(
+            _boxCollider.bounds.center,
+            _boxCollider.bounds.size,
+            0f,
+            1 << 0 // Default layer (Player)
+        );
+
+        if (hit != null)
+        {
+            var playerHealth = hit.GetComponentInParent<PlayerHealth>();
+            if (playerHealth != null)
+            {
+                int dmg = _data != null ? _data.contactDamage : 1;
+                playerHealth.TakeDamage(dmg);
+            }
+        }
     }
 
     /// <summary>
@@ -120,14 +167,21 @@ public class BaseEnemy : MonoBehaviour
         {
             Die();
         }
+
+        UpdateHealthBar();
     }
 
     private IEnumerator HitFlashRoutine()
     {
         Color originalColor = _isRespawned && _data != null ? _data.respawnTint : Color.white;
-        _spriteRenderer.color = _hitFlashColor;
-        yield return new WaitForSeconds(_hitFlashDuration);
-        _spriteRenderer.color = originalColor;
+
+        for (int i = 0; i < _hitFlashCount; i++)
+        {
+            _spriteRenderer.color = _hitFlashColor;
+            yield return new WaitForSeconds(_hitFlashDuration * 0.5f);
+            _spriteRenderer.color = originalColor;
+            yield return new WaitForSeconds(_hitFlashDuration * 0.5f);
+        }
     }
 
     protected virtual void Die()
@@ -141,35 +195,96 @@ public class BaseEnemy : MonoBehaviour
         // Broadcast Death Event
         _onEnemyKilled?.Raise();
 
-        if (_animator != null)
+        // Raise death-drop event so a falling sprite is spawned
+        if (_onDeathDrop != null && _onDeathDrop.HasListeners && _spriteRenderer != null)
         {
-            _animator.SetTrigger("Die");
-            // If using animator, you might want to delay Destroy or handle it via Animation Event.
-            // For now, we destroy after a tiny delay so the audio/particles can trigger.
-            // Or just destroy immediately if it's a fast-paced arcade style:
+            _onDeathDrop.Raise(new DeathDropData
+            {
+                sprite = _spriteRenderer.sprite,
+                position = transform.position
+            });
         }
 
+        // Hide health bar on death
+        if (_healthBar != null) _healthBar.gameObject.SetActive(false);
+
+        // Destroy immediately — death drop handles the visual
         Destroy(gameObject);
     }
 
     /// <summary>
-    /// Called by Vacuum tool — suck this enemy toward a point.
+    /// Called by Vacuum tool — smooth pull enemy toward target + scale down.
+    /// Enemy manages its own pull animation via coroutine.
     /// </summary>
-    public virtual void GetSucked(Vector2 targetPosition)
+    /// <param name="target">Transform to pull toward (updates each frame as player moves)</param>
+    /// <param name="duration">How long the pull + scale-down animation takes</param>
+    /// <param name="pullSpeed">Movement speed toward target (units/s)</param>
+    /// <param name="onAbsorbed">Callback when enemy is fully absorbed</param>
+    public virtual void GetSucked(Transform target, float duration, float pullSpeed, System.Action onAbsorbed)
     {
         if (_beingSucked) return;
         _beingSucked = true;
 
-        // Disable normal movement
+        // Disable physics & collision immediately
         if (_rb != null)
         {
             _rb.linearVelocity = Vector2.zero;
             _rb.gravityScale = 0f;
         }
+        if (_boxCollider != null)
+            _boxCollider.enabled = false;
 
-        // Move toward target
+        _suckCoroutine = StartCoroutine(SuckAnimationRoutine(target, duration, pullSpeed, onAbsorbed));
+    }
+
+    /// <summary>
+    /// Legacy overload — instant teleport. Kept for backward compatibility.
+    /// </summary>
+    [System.Obsolete("Use GetSucked(Transform, float, float, Action) for smooth pull")]
+    public virtual void GetSucked(Vector2 targetPosition)
+    {
+        if (_beingSucked) return;
+        _beingSucked = true;
+        if (_rb != null) { _rb.linearVelocity = Vector2.zero; _rb.gravityScale = 0f; }
+        if (_boxCollider != null) _boxCollider.enabled = false;
         transform.position = targetPosition;
-        gameObject.SetActive(false); // Hide until shot out
+        gameObject.SetActive(false);
+    }
+
+    private IEnumerator SuckAnimationRoutine(Transform target, float duration, float pullSpeed, System.Action onAbsorbed)
+    {
+        Vector3 originalScale = transform.localScale;
+        float elapsed = 0f;
+
+        // Hide health bar during suck
+        if (_healthBar != null)
+            _healthBar.gameObject.SetActive(false);
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+
+            // Move toward target (read position each frame — player moves)
+            if (target != null)
+            {
+                transform.position = Vector3.MoveTowards(
+                    transform.position,
+                    target.position,
+                    pullSpeed * Time.deltaTime
+                );
+            }
+
+            // Scale down: original → zero
+            transform.localScale = Vector3.Lerp(originalScale, Vector3.zero, t);
+
+            yield return null;
+        }
+
+        // Absorb complete
+        transform.localScale = Vector3.zero;
+        gameObject.SetActive(false);
+        onAbsorbed?.Invoke();
     }
 
     /// <summary>
@@ -181,6 +296,10 @@ public class BaseEnemy : MonoBehaviour
         _isRespawned = true;
 
         if (_data == null) return;
+
+        // Heal to full HP on angry respawn
+        _currentHP = _maxHP;
+        UpdateHealthBar();
 
         // Apply angry sprite if available
         if (_data.angrySprite != null && _spriteRenderer != null)
@@ -201,5 +320,14 @@ public class BaseEnemy : MonoBehaviour
         // Enable angry VFX child (looping animation on top of enemy's head)
         if (_angryVFX != null)
             _angryVFX.SetActive(true);
+    }
+
+    /// <summary>
+    /// Update the floating health bar (if present).
+    /// </summary>
+    private void UpdateHealthBar()
+    {
+        if (_healthBar != null)
+            _healthBar.SetHP(_currentHP, _maxHP);
     }
 }

@@ -15,9 +15,6 @@ public class WalkerEnemy : BaseEnemy
     {
         base.Awake();
 
-        if (_rb == null)
-            _rb = GetComponent<Rigidbody2D>();
-
         // Apply gravity scale from EnemyData SO (runtime config)
         _rb.gravityScale = _data != null ? _data.gravityScale : 3f;
 
@@ -58,21 +55,6 @@ public class WalkerEnemy : BaseEnemy
                 _direction *= -1;
                 break;
             }
-        }
-    }
-
-    /// <summary>
-    /// Deals contact damage to player.
-    /// </summary>
-    private void OnCollisionStay2D(Collision2D collision)
-    {
-        if (_isDead) return;
-
-        var playerHealth = collision.gameObject.GetComponent<PlayerHealth>();
-        if (playerHealth != null)
-        {
-            int dmg = _data != null ? _data.contactDamage : 1;
-            playerHealth.TakeDamage(dmg);
         }
     }
 }

@@ -20,6 +20,7 @@ public class BlowtorchTool : BaseTool
     public override void Attack()
     {
         if (!CanAttack()) return;
+        PlayAttackSFX();
 
         _isAttacking = true;
 

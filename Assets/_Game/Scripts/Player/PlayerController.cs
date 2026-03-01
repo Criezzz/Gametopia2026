@@ -112,6 +112,10 @@ public class PlayerController : MonoBehaviour
             _velocityY = _initialJumpVelocity;
             _jumpCut = false;
             _jumpRequested = false;
+
+            // Jump SFX
+            if (_data != null && _data.jumpSFX != null && SFXManager.Instance != null)
+                SFXManager.Instance.Play(_data.jumpSFX);
         }
 
         // --- Jump cut (variable height) ---
@@ -245,6 +249,31 @@ public class PlayerController : MonoBehaviour
 
         return false;
     }
+
+#if UNITY_EDITOR
+    /// <summary>
+    /// Draw the actual BoxCollider2D bounds so you can see where it really is.
+    /// Green = collider, Yellow = sprite bounds.
+    /// </summary>
+    private void OnDrawGizmos()
+    {
+        if (_boxCollider == null) _boxCollider = GetComponent<BoxCollider2D>();
+        if (_boxCollider != null)
+        {
+            Gizmos.color = Color.green;
+            Vector2 center = (Vector2)transform.position + _boxCollider.offset;
+            Vector2 size = _boxCollider.size;
+            Gizmos.DrawWireCube(center, size);
+        }
+
+        var sr = GetComponentInChildren<SpriteRenderer>();
+        if (sr != null)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireCube(sr.bounds.center, sr.bounds.size);
+        }
+    }
+#endif
 
 }
 

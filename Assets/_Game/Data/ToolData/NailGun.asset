@@ -26,6 +26,7 @@ MonoBehaviour:
   toolSprite: {fileID: 0}
   attackPrefab: {fileID: 0}
   attackAnimator: {fileID: 0}
-  weaponHoldDistance: 0
+  weaponHoldDistance: 1
   weaponYOffset: 0
+  behaviorConfig: {fileID: 0}
   attackSFX: {fileID: 0}

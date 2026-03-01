@@ -179,7 +179,13 @@ public class GameManager : MonoBehaviour
                 Debug.Log($"[GameManager] Unlocked tool: {tool.toolName}!");
 
                 if (raiseMilestoneEvent)
+                {
                     _onMilestoneReached?.Raise(tool.unlockScore);
+
+                    // Milestone unlock SFX
+                    if (SFXManager.Instance != null && SFXManager.Instance.MilestoneSFX != null)
+                        SFXManager.Instance.Play(SFXManager.Instance.MilestoneSFX);
+                }
             }
         }
     }

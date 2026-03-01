@@ -22,3 +22,4 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 256
+  jumpSFX: {fileID: 8300000, guid: b37292b18e1f4c843896cfda5f3f37f7, type: 3}

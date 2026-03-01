@@ -317,7 +317,7 @@ Rigidbody2D:
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_GravityScale: 0
-  m_Material: {fileID: 6200000, guid: 72bd24145814309468045f622edd0c95, type: 2}
+  m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -338,7 +338,7 @@ BoxCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 72bd24145814309468045f622edd0c95, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -362,7 +362,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.00020265579, y: -0.0013947487}
+  m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -388,6 +388,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
   _onPlayerDied: {fileID: 11400000, guid: 51eb91e2562ea544cb4b1adb91701478, type: 2}
   _pitDeathOffset: 0.5
+  _spawnGraceDuration: 0.5
 --- !u!114 &7726550380551854199
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -413,8 +414,6 @@ MonoBehaviour:
   _weaponVisualRoot: {fileID: 7065063228493796851}
   _weaponSpriteRenderer: {fileID: 3322711771092581431}
   _weaponAnimator: {fileID: 8626824105392509231}
-  _weaponHoldDistance: 0
-  _weaponYOffset: 0
   _weaponSortingOrderOffset: 3
 --- !u!114 &4691685812222822017
 MonoBehaviour:
@@ -524,11 +523,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 512
   _enemyProjectilePrefab: {fileID: 0}
-  _suckDuration: 1
-  _suckRange: 3
-  _shootSpeed: 10
-  _shootDamage: 10
-  _shootInterval: 0.15
 --- !u!114 &8482052819309527723
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -19,9 +19,6 @@ public class FlyerEnemy : BaseEnemy
     {
         base.Awake();
 
-        if (_rb == null)
-            _rb = GetComponent<Rigidbody2D>();
-
         // Random initial direction and phase
         _direction = Random.value > 0.5f ? 1 : -1;
         _timeOffset = Random.Range(0f, Mathf.PI * 2f);
@@ -68,21 +65,6 @@ public class FlyerEnemy : BaseEnemy
                 _direction *= -1;
                 break;
             }
-        }
-    }
-
-    /// <summary>
-    /// Deals contact damage to player.
-    /// </summary>
-    private void OnCollisionStay2D(Collision2D collision)
-    {
-        if (_isDead) return;
-
-        var playerHealth = collision.gameObject.GetComponent<PlayerHealth>();
-        if (playerHealth != null)
-        {
-            int dmg = _data != null ? _data.contactDamage : 1;
-            playerHealth.TakeDamage(dmg);
         }
     }
 }

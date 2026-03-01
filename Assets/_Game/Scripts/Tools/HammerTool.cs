@@ -12,6 +12,7 @@ public class HammerTool : BaseTool
     public override void Attack()
     {
         if (!CanAttack()) return;
+        PlayAttackSFX();
 
         Vector2 origin = GetAttackOrigin();
         Vector2 dir = GetAttackDirection();

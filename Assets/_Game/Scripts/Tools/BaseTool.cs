@@ -12,6 +12,12 @@ public abstract class BaseTool : MonoBehaviour
     protected bool _isAttacking;
 
     /// <summary>
+    /// Callback invoked by PlayerToolHandler so tools can request animation phase swaps.
+    /// </summary>
+    public System.Action OnRequestSecondaryAnimation;
+    public System.Action OnRequestPrimaryAnimation;
+
+    /// <summary>
     /// Initialize the tool with its data and the player.
     /// </summary>
     public virtual void Initialize(ToolData data, PlayerController player)
@@ -42,6 +48,16 @@ public abstract class BaseTool : MonoBehaviour
     public abstract void Attack();
 
     /// <summary>
+    /// Play the tool's attack SFX (from ToolData.attackSFX) if assigned.
+    /// Call this at the start of each tool's Attack() override.
+    /// </summary>
+    protected void PlayAttackSFX()
+    {
+        if (_toolData != null && _toolData.attackSFX != null && SFXManager.Instance != null)
+            SFXManager.Instance.Play(_toolData.attackSFX);
+    }
+
+    /// <summary>
     /// Stop attacking. Called when player releases attack (for continuous tools).
     /// </summary>
     public virtual void StopAttack()
@@ -56,6 +72,8 @@ public abstract class BaseTool : MonoBehaviour
     public virtual void OnUnequip()
     {
         StopAttack();
+        OnRequestSecondaryAnimation = null;
+        OnRequestPrimaryAnimation = null;
     }
 
     /// <summary>

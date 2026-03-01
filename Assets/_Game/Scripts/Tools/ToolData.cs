@@ -33,12 +33,12 @@ public class ToolData : ScriptableObject
 
     [Header("Combat Stats")]
     public int damage = 10;
+    [Tooltip("Secondary damage for multi-phase tools (e.g. Tape retract, Vacuum shoot)")]
+    public int secondaryDamage = 0;
     public float cooldown = 0.5f;
     [Tooltip("Range in units (melee hitbox length, beam length, etc.)")]
     public float attackParam = 2f;
     public bool pierce;
-    [Tooltip("Knockback force applied to enemies on hit")]
-    public float knockback = 2f;
 
     [Header("Visuals")]
     public Sprite toolIcon;

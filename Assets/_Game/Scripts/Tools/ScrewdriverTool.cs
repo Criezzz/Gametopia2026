@@ -6,7 +6,6 @@ using UnityEngine;
 public class ScrewdriverTool : BaseTool
 {
     [Header("Screwdriver Settings")]
-    [SerializeField] private GameObject _projectilePrefab;
     [SerializeField] private float _projectileSpeed = 10f;
 
     public override void Initialize(ToolData data, PlayerController player)
@@ -19,20 +18,18 @@ public class ScrewdriverTool : BaseTool
     public override void Attack()
     {
         if (!CanAttack()) return;
+        PlayAttackSFX();
 
         Vector2 origin = GetAttackOrigin();
         Vector2 dir = GetAttackDirection();
         int damage = _toolData != null ? _toolData.damage : 4;
+        GameObject prefab = _toolData != null ? _toolData.attackPrefab : null;
 
-        // Spawn projectile
-        if (_projectilePrefab != null)
+        if (prefab != null)
         {
-            GameObject proj = Instantiate(_projectilePrefab, origin, Quaternion.identity);
+            GameObject proj = Instantiate(prefab, origin, Quaternion.identity);
             var toolProjectile = proj.GetComponent<ToolProjectile>();
-            if (toolProjectile != null)
-            {
-                toolProjectile.Initialize(dir, _projectileSpeed, damage, false);
-            }
+            toolProjectile.Initialize(dir, _projectileSpeed, damage, false);
         }
 
         StartCooldown();

@@ -36,6 +36,7 @@ public class PlayerToolHandler : MonoBehaviour
 
     public ToolData CurrentToolData => _currentToolData;
     private static readonly int AttackHash = Animator.StringToHash("Attack");
+    private static readonly int SecondaryPhaseHash = Animator.StringToHash("SecondaryPhase");
 
     /// <summary>
     /// Called by PlayerHealth when the player dies. Hides weapon and stops updates.
@@ -126,6 +127,8 @@ public class PlayerToolHandler : MonoBehaviour
         if (tool != null)
         {
             tool.enabled = true;
+            tool.OnRequestSecondaryAnimation = PlaySecondaryAnimation;
+            tool.OnRequestPrimaryAnimation = PlayPrimaryAnimation;
             tool.Initialize(newToolData, _playerController);
             _currentTool = tool;
             Debug.Log($"[PlayerToolHandler] Equipped: {newToolData.toolName}");
@@ -211,7 +214,34 @@ public class PlayerToolHandler : MonoBehaviour
         if (_weaponAnimator == null || _weaponAnimator.runtimeAnimatorController == null)
             return;
 
-        _weaponAnimator.SetTrigger(AttackHash);
+        foreach (var param in _weaponAnimator.parameters)
+        {
+            if (param.nameHash == AttackHash && param.type == AnimatorControllerParameterType.Trigger)
+            {
+                _weaponAnimator.SetTrigger(AttackHash);
+                return;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Set SecondaryPhase = true so the animator transitions to the phase-2 state.
+    /// Called by multi-phase tools (Tape retract, Vacuum shoot).
+    /// </summary>
+    private void PlaySecondaryAnimation()
+    {
+        if (_weaponAnimator == null || _weaponAnimator.runtimeAnimatorController == null) return;
+        _weaponAnimator.SetBool(SecondaryPhaseHash, true);
+    }
+
+    /// <summary>
+    /// Set SecondaryPhase = false so the animator returns to idle / phase-1 ready.
+    /// Called when multi-phase attack completes.
+    /// </summary>
+    private void PlayPrimaryAnimation()
+    {
+        if (_weaponAnimator == null || _weaponAnimator.runtimeAnimatorController == null) return;
+        _weaponAnimator.SetBool(SecondaryPhaseHash, false);
     }
 
     private BaseTool GetToolComponent(ToolData data)

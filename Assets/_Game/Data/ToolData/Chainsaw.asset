@@ -18,14 +18,15 @@ MonoBehaviour:
   unlockScore: 67
   baseWeight: 90
   damage: 5
+  secondaryDamage: 0
   cooldown: 0.1
-  attackParam: 2
+  attackParam: 3
   pierce: 0
-  knockback: 1
-  toolIcon: {fileID: 0}
-  toolSprite: {fileID: 0}
+  toolIcon: {fileID: 5881040114983578648, guid: 6f20c114a0a1bf04c979737d3f1e34b4, type: 3}
+  toolSprite: {fileID: 5881040114983578648, guid: 6f20c114a0a1bf04c979737d3f1e34b4, type: 3}
   attackPrefab: {fileID: 0}
-  attackAnimator: {fileID: 0}
-  weaponHoldDistance: 0.3
+  attackAnimator: {fileID: 9100000, guid: c0883fc6ccfc39141b2c596512ac5587, type: 2}
+  weaponHoldDistance: 0.5
   weaponYOffset: 0
+  behaviorConfig: {fileID: 0}
   attackSFX: {fileID: 0}

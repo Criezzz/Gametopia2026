@@ -50,6 +50,10 @@ public class Toolbox : MonoBehaviour
 
     private void PickUp()
     {
+        // Pickup SFX
+        if (SFXManager.Instance != null && SFXManager.Instance.PickupSFX != null)
+            SFXManager.Instance.Play(SFXManager.Instance.PickupSFX);
+
         _onToolPickedUp?.Raise();
         Respawn();
     }

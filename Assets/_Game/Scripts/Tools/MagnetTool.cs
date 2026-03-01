@@ -32,6 +32,7 @@ public class MagnetTool : BaseTool
     public override void Attack()
     {
         if (!CanAttack()) return;
+        PlayAttackSFX();
 
         _isAttacking = true;
 

@@ -6,7 +6,6 @@ using UnityEngine;
 public class NailGunTool : BaseTool
 {
     [Header("Nail Gun Settings")]
-    [SerializeField] private GameObject _nailPrefab;
     [SerializeField] private float _nailSpeed = 12f;
 
     public override void Initialize(ToolData data, PlayerController player)
@@ -19,20 +18,18 @@ public class NailGunTool : BaseTool
     public override void Attack()
     {
         if (!CanAttack()) return;
+        PlayAttackSFX();
 
         Vector2 origin = GetAttackOrigin();
         Vector2 dir = GetAttackDirection();
         int damage = _toolData != null ? _toolData.damage : 1;
+        GameObject prefab = _toolData != null ? _toolData.attackPrefab : null;
 
-        // Spawn nail projectile
-        if (_nailPrefab != null)
+        if (prefab != null)
         {
-            GameObject nail = Instantiate(_nailPrefab, origin, Quaternion.identity);
+            GameObject nail = Instantiate(prefab, origin, Quaternion.identity);
             var proj = nail.GetComponent<ToolProjectile>();
-            if (proj != null)
-            {
-                proj.Initialize(dir, _nailSpeed, damage, false);
-            }
+            proj.Initialize(dir, _nailSpeed, damage, false);
         }
 
         StartCooldown();

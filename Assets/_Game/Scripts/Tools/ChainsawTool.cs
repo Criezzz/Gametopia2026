@@ -20,6 +20,7 @@ public class ChainsawTool : BaseTool
     public override void Attack()
     {
         if (!CanAttack()) return;
+        PlayAttackSFX();
 
         _isAttacking = true;
 

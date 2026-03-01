@@ -34,4 +34,7 @@ public class PlayerData : ScriptableObject
     [Header("Ground Check")]
     public float groundCheckRadius = 0.15f;
     public LayerMask groundLayer;
+
+    [Header("Audio")]
+    public AudioClip jumpSFX;
 }

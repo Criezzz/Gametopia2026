@@ -11,4 +11,11 @@ public class VacuumToolConfig : ToolBehaviorConfig
     public float shootSpeed = 10f;
     public int shootDamage = 10;
     public float shootInterval = 0.15f;
+
+    [Header("Suck Animation")]
+    [Tooltip("Time for enemy to be pulled toward nozzle + scale down (seconds)")]
+    public float suckAnimDuration = 0.5f;
+
+    [Tooltip("Pull speed toward nozzle (units/s)")]
+    public float suckPullSpeed = 8f;
 }
