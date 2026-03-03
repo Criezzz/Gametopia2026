@@ -1,10 +1,16 @@
 fileFormatVersion: 2
-guid: da04b846fad3db74b97d4820dcf2ae3c
+guid: edef99a6b34295b428987a64be1509b0
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1515908175581636556
-    second: Frame5_0
+      213: -8550861254918642210
+    second: blowtorch7_0
+  - first:
+      213: -5490372603357762709
+    second: blowtorch7_1
+  - first:
+      213: -1037989042208206765
+    second: blowtorch7_2
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -97,32 +103,6 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 4
-    buildTarget: Android
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WindowsStoreApps
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
     buildTarget: WebGL
     maxTextureSize: 2048
     resizeAlgorithm: 0
@@ -139,23 +119,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Frame5_0
+      name: blowtorch7_0
       rect:
         serializedVersion: 2
-        x: 3
+        x: 0
         y: 0
-        width: 25
-        height: 27
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        width: 48
+        height: 16
+      alignment: 6
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: cc767ad3476990510800000000000000
-      internalID: 1515908175581636556
+      spriteID: ed56ce83efc355980800000000000000
+      internalID: -8550861254918642210
       vertices: []
       indices: 
       edges: []
@@ -164,7 +144,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 1b43cac4f4766df46aaeb40a462c76df
+    spriteID: 527abbd27c28fc64daca9f7736cc36c4
     internalID: 0
     vertices: []
     indices: 
@@ -174,7 +154,9 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Frame5_0: 1515908175581636556
+      blowtorch7_0: -8550861254918642210
+      blowtorch7_1: -5490372603357762709
+      blowtorch7_2: -1037989042208206765
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -10,22 +10,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8da7035c4a71f964eab2286e22dae45f, type: 3}
-  m_Name: Flyer
+  m_Name: Elite
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
-  enemyName: Flyer
-  moveType: 1
-  maxHP: 8
-  moveSpeed: 2
-  contactDamage: 1
-  gravityScale: 0
-  firstSpawnDelay: 6
-  spawnInterval: 5
-  difficultyTickInterval: 10
-  intervalReductionPerTick: 0.2
-  minSpawnInterval: 2
-  respawnSpeedMultiplier: 2
-  respawnTint: {r: 1, g: 0.5, b: 0.2, a: 1}
+  enemyName: Elite
+  moveType: 2
+  maxHP: 12
+  moveSpeed: 2.5
+  contactDamage: 2
+  gravityScale: 1
+  firstSpawnDelay: 8
+  spawnInterval: 6
+  difficultyTickInterval: 15
+  intervalReductionPerTick: 0.5
+  minSpawnInterval: 4
+  respawnSpeedMultiplier: 1.8
+  respawnTint: {r: 1, g: 0.2, b: 0.5, a: 1}
   enemySprite: {fileID: 0}
   angrySprite: {fileID: 0}
-  animatorController: {fileID: 9100000, guid: 14e5cef36039ea1488cb242cfaf9db37, type: 2}
+  animatorController: {fileID: 9100000, guid: 64a66c954d8c6b248993b4e17d0c253f, type: 2}
   angryAnimatorController: {fileID: 0}

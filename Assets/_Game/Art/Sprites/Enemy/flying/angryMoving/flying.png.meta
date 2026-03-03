@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: da04b846fad3db74b97d4820dcf2ae3c
+guid: 501f02fae300cdc4aa3bf13bba5df3d1
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1515908175581636556
-    second: Frame5_0
+      213: -8716530363669133318
+    second: flying_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -139,13 +139,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Frame5_0
+      name: flying_0
       rect:
         serializedVersion: 2
-        x: 3
-        y: 0
-        width: 25
-        height: 27
+        x: 5
+        y: 19
+        width: 21
+        height: 13
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -154,8 +154,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: cc767ad3476990510800000000000000
-      internalID: 1515908175581636556
+      spriteID: af7489ff0d9a80780800000000000000
+      internalID: -8716530363669133318
       vertices: []
       indices: 
       edges: []
@@ -164,7 +164,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 1b43cac4f4766df46aaeb40a462c76df
+    spriteID: 4ea7b8d2042dc544bb3017d7c9896115
     internalID: 0
     vertices: []
     indices: 
@@ -174,7 +174,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Frame5_0: 1515908175581636556
+      flying_0: -8716530363669133318
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

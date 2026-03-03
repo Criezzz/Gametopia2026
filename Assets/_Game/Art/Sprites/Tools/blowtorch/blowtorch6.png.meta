@@ -1,10 +1,13 @@
 fileFormatVersion: 2
-guid: 501f02fae300cdc4aa3bf13bba5df3d1
+guid: 45a5adacdf56ae24cbe6c022338fe1b7
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -8716530363669133318
-    second: flying_0
+      213: -3558399084813970558
+    second: blowtorch6_0
+  - first:
+      213: -8929016752954178168
+    second: blowtorch6_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +40,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -51,7 +54,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 16
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -75,7 +78,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 2
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -97,20 +100,7 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 4
-    buildTarget: Android
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WindowsStoreApps
+    buildTarget: WebGL
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -126,14 +116,14 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: flying_0
+      name: blowtorch6_0
       rect:
         serializedVersion: 2
-        x: 4
-        y: 18
-        width: 23
-        height: 14
-      alignment: 0
+        x: 0
+        y: 0
+        width: 48
+        height: 16
+      alignment: 6
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
@@ -141,8 +131,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: af7489ff0d9a80780800000000000000
-      internalID: -8716530363669133318
+      spriteID: 2839694b2e60e9ec0800000000000000
+      internalID: -3558399084813970558
       vertices: []
       indices: 
       edges: []
@@ -151,7 +141,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 202ed3e989a6b4e409be7a770605c317
     internalID: 0
     vertices: []
     indices: 
@@ -161,7 +151,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      flying_0: -8716530363669133318
+      blowtorch6_0: -3558399084813970558
+      blowtorch6_1: -8929016752954178168
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

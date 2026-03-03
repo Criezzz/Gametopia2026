@@ -71,6 +71,13 @@ public class BaseEnemy : MonoBehaviour
         {
             _maxHP = _data.maxHP;
             _currentHP = _maxHP;
+
+            // Auto-assign animator controller from EnemyData SO if not already set
+            if (_animator != null && _data.animatorController != null
+                && _animator.runtimeAnimatorController == null)
+            {
+                _animator.runtimeAnimatorController = _data.animatorController;
+            }
         }
         else
         {
@@ -305,15 +312,12 @@ public class BaseEnemy : MonoBehaviour
         if (_data.angrySprite != null && _spriteRenderer != null)
             _spriteRenderer.sprite = _data.angrySprite;
 
-        // Apply angry animator controller if available
-        if (_data.angryAnimatorController != null && _animator != null)
-            _animator.runtimeAnimatorController = _data.angryAnimatorController;
-
         // Apply tint
         if (_spriteRenderer != null)
             _spriteRenderer.color = _data.respawnTint;
 
-        // Trigger angry animation state (animator will ignore if no "IsAngry" param exists)
+        // Trigger angry animation state via IsAngry bool parameter
+        // The single animator controller handles the movingNormal -> movingAngry transition
         if (_animator != null)
             _animator.SetBool("IsAngry", true);
 

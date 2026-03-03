@@ -1,7 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// ScriptableObject defining an enemy type's stats and behavior.
+/// ScriptableObject defining an enemy type's stats, behavior, and spawn timing.
+/// Each enemy type manages its own independent spawn schedule.
 /// </summary>
 [CreateAssetMenu(menuName = "ToolCrate/Enemy Data")]
 public class EnemyData : ScriptableObject
@@ -17,9 +18,17 @@ public class EnemyData : ScriptableObject
     [Tooltip("Rigidbody2D gravity scale. Higher = falls faster.")]
     public float gravityScale = 3f;
 
-    [Header("Spawn")]
-    [Tooltip("Minimum score before this enemy starts spawning")]
-    public int minScoreToSpawn = 0;
+    [Header("Spawn Timing")]
+    [Tooltip("Seconds after game start before the first enemy of this type spawns")]
+    public float firstSpawnDelay = 0f;
+    [Tooltip("Base interval between spawns (seconds)")]
+    public float spawnInterval = 3f;
+    [Tooltip("Every this many seconds the spawn interval decreases")]
+    public float difficultyTickInterval = 10f;
+    [Tooltip("How much to reduce spawn interval each difficulty tick (seconds)")]
+    public float intervalReductionPerTick = 0.15f;
+    [Tooltip("Minimum spawn interval — will never go below this value")]
+    public float minSpawnInterval = 0.8f;
 
     [Header("Bottom Respawn")]
     [Tooltip("Speed multiplier when respawning from bottom (angry)")]
@@ -32,7 +41,9 @@ public class EnemyData : ScriptableObject
     [Tooltip("Sprite used when enemy becomes angry (after falling off screen)")]
     public Sprite angrySprite;
     public RuntimeAnimatorController animatorController;
-    [Tooltip("Animator controller used when enemy becomes angry")]
+
+    [System.Obsolete("No longer used. Each normalAnimator.controller now contains both normal and angry states with an IsAngry bool transition.")]
+    [HideInInspector]
     public RuntimeAnimatorController angryAnimatorController;
 }
 

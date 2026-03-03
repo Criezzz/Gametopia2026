@@ -1,26 +1,22 @@
+using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// Spawns enemies at timed intervals and handles angry respawns
-/// when enemies fall off the bottom of the screen.
+/// Spawns enemies on independent per-type timers driven by EnemyData SOs.
+/// Also triggers horde events (bursts of enemies) on a separate timer.
+/// Handles angry respawns when enemies fall off the bottom of the screen.
 /// </summary>
 public class EnemySpawner : MonoBehaviour
 {
-    [Header("Spawn Settings")]
-    [SerializeField] private GameObject _walkerPrefab;
-    [SerializeField] private GameObject _flyerPrefab;
-    [SerializeField] private float _spawnInterval = 3f;
+    [Header("Enemy Lanes")]
+    [Tooltip("Each entry is an independent spawn lane driven by its EnemyData SO timing fields.")]
+    [SerializeField] private SpawnLane[] _lanes;
 
-    [Header("Difficulty Scaling")]
-    [Tooltip("Every this many seconds, spawn interval decreases")]
-    [SerializeField] private float _difficultyTickInterval = 10f;
-    [Tooltip("How much to reduce spawn interval each tick (seconds)")]
-    [SerializeField] private float _intervalReductionPerTick = 0.15f;
-    [Tooltip("Minimum spawn interval (won't go below this)")]
-    [SerializeField] private float _minSpawnInterval = 0.8f;
+    [Header("Horde")]
+    [SerializeField] private HordeConfig _hordeConfig;
 
     [Header("Spawn Area")]
-    [SerializeField] private float _spawnYOffset = 1f; // Above camera top
+    [SerializeField] private float _spawnYOffset = 1f;
     [SerializeField] private float _spawnXLeft = -4f;
     [SerializeField] private float _spawnXRight = 4f;
 
@@ -33,15 +29,20 @@ public class EnemySpawner : MonoBehaviour
     [Header("Event Channels")]
     [SerializeField] private EnemyFallChannel _onEnemyFell;
 
-    private float _spawnTimer;
-    private float _difficultyTimer;
-    private float _currentSpawnInterval;
+    // Runtime state per lane (not serialized)
+    private float[] _spawnTimers;
+    private float[] _currentIntervals;
+    private float[] _difficultyTimers;
+
+    // Horde runtime state
+    private float _hordeSpawnTimer;
+    private float _hordeCurrentInterval;
+    private float _hordeDifficultyTimer;
 
     private void Start()
     {
-        _currentSpawnInterval = _spawnInterval;
-        _spawnTimer = _currentSpawnInterval;
-        _difficultyTimer = _difficultyTickInterval;
+        InitLanes();
+        InitHorde();
     }
 
     private void OnEnable()
@@ -58,46 +59,137 @@ public class EnemySpawner : MonoBehaviour
 
     private void Update()
     {
-        // Difficulty scaling
-        _difficultyTimer -= Time.deltaTime;
-        if (_difficultyTimer <= 0f)
-        {
-            _difficultyTimer = _difficultyTickInterval;
-            _currentSpawnInterval = Mathf.Max(
-                _minSpawnInterval,
-                _currentSpawnInterval - _intervalReductionPerTick
-            );
-            Debug.Log($"[EnemySpawner] Difficulty up! Spawn interval: {_currentSpawnInterval:F2}s");
-        }
-
-        // Spawn timer
-        _spawnTimer -= Time.deltaTime;
-        if (_spawnTimer <= 0f)
-        {
-            SpawnWalker();
-            _spawnTimer = _currentSpawnInterval;
-        }
+        UpdateLanes();
+        UpdateHorde();
     }
 
-    private void SpawnWalker()
+    #region Lane System
+
+    private void InitLanes()
     {
-        if (_walkerPrefab == null || Camera.main == null)
-            return;
+        if (_lanes == null) return;
 
-        float x = Random.value > 0.5f ? _spawnXRight : _spawnXLeft;
-        float y = Camera.main.orthographicSize + _spawnYOffset;
-        Instantiate(_walkerPrefab, new Vector2(x, y), Quaternion.identity);
+        _spawnTimers = new float[_lanes.Length];
+        _currentIntervals = new float[_lanes.Length];
+        _difficultyTimers = new float[_lanes.Length];
+
+        for (int i = 0; i < _lanes.Length; i++)
+        {
+            var data = _lanes[i].enemyData;
+            if (data == null) continue;
+
+            // First spawn uses firstSpawnDelay; after that uses interval
+            _spawnTimers[i] = data.firstSpawnDelay;
+            _currentIntervals[i] = data.spawnInterval;
+            _difficultyTimers[i] = data.difficultyTickInterval;
+        }
     }
+
+    private void UpdateLanes()
+    {
+        if (_lanes == null) return;
+
+        for (int i = 0; i < _lanes.Length; i++)
+        {
+            var lane = _lanes[i];
+            if (lane.prefab == null || lane.enemyData == null) continue;
+
+            var data = lane.enemyData;
+
+            // Difficulty scaling per lane
+            _difficultyTimers[i] -= Time.deltaTime;
+            if (_difficultyTimers[i] <= 0f)
+            {
+                _difficultyTimers[i] = data.difficultyTickInterval;
+                _currentIntervals[i] = Mathf.Max(
+                    data.minSpawnInterval,
+                    _currentIntervals[i] - data.intervalReductionPerTick
+                );
+            }
+
+            // Spawn timer per lane
+            _spawnTimers[i] -= Time.deltaTime;
+            if (_spawnTimers[i] <= 0f)
+            {
+                SpawnEnemy(lane.prefab);
+                _spawnTimers[i] = _currentIntervals[i];
+            }
+        }
+    }
+
+    #endregion
+
+    #region Horde System
+
+    private void InitHorde()
+    {
+        if (_hordeConfig == null) return;
+
+        _hordeSpawnTimer = _hordeConfig.firstHordeDelay;
+        _hordeCurrentInterval = _hordeConfig.hordeInterval;
+        _hordeDifficultyTimer = _hordeConfig.difficultyTickInterval;
+    }
+
+    private void UpdateHorde()
+    {
+        if (_hordeConfig == null || _hordeConfig.enemyPrefab == null) return;
+
+        // Difficulty scaling for horde
+        _hordeDifficultyTimer -= Time.deltaTime;
+        if (_hordeDifficultyTimer <= 0f)
+        {
+            _hordeDifficultyTimer = _hordeConfig.difficultyTickInterval;
+            _hordeCurrentInterval = Mathf.Max(
+                _hordeConfig.minHordeInterval,
+                _hordeCurrentInterval - _hordeConfig.intervalReductionPerTick
+            );
+        }
+
+        // Horde timer
+        _hordeSpawnTimer -= Time.deltaTime;
+        if (_hordeSpawnTimer <= 0f)
+        {
+            StartCoroutine(SpawnHordeRoutine());
+            _hordeSpawnTimer = _hordeCurrentInterval;
+        }
+    }
+
+    private IEnumerator SpawnHordeRoutine()
+    {
+        for (int i = 0; i < _hordeConfig.enemyCount; i++)
+        {
+            SpawnEnemy(_hordeConfig.enemyPrefab);
+
+            if (i < _hordeConfig.enemyCount - 1)
+                yield return new WaitForSeconds(_hordeConfig.delayBetweenSpawns);
+        }
+    }
+
+    #endregion
+
+    #region Spawn Helpers
+
+    private void SpawnEnemy(GameObject prefab)
+    {
+        if (prefab == null || Camera.main == null) return;
+
+        float x = Random.Range(_spawnXLeft, _spawnXRight);
+        float y = Camera.main.transform.position.y + Camera.main.orthographicSize + _spawnYOffset;
+        Instantiate(prefab, new Vector2(x, y), Quaternion.identity);
+    }
+
+    #endregion
+
+    #region Angry Respawn
 
     /// <summary>
     /// Called when an enemy falls off the screen via the EnemyFallChannel.
-    /// Respawns the enemy at the top of the screen as angry (if not already).
+    /// Respawns the enemy at the top of the screen as angry.
     /// </summary>
     private void HandleEnemyFell(EnemyFallData data)
     {
         if (data.enemyData == null || Camera.main == null) return;
 
-        // Pick the right prefab based on enemy move type
         GameObject prefab = GetPrefabForMoveType(data.enemyData.moveType);
         if (prefab == null)
         {
@@ -105,7 +197,6 @@ public class EnemySpawner : MonoBehaviour
             return;
         }
 
-        // Spawn at random X, just above camera top
         float x = Random.Range(_spawnXLeft, _spawnXRight);
         float y = Camera.main.transform.position.y + Camera.main.orthographicSize + _spawnYOffset;
 
@@ -114,10 +205,8 @@ public class EnemySpawner : MonoBehaviour
 
         if (baseEnemy != null)
         {
-            // Always mark as angry on respawn
             baseEnemy.MarkAsRespawned();
 
-            // Camera shake when angry enemy drops from the sky
             if (CameraShake.Instance != null)
                 CameraShake.Instance.Shake(_angryDropShakeDuration, _angryDropShakeMagnitude);
 
@@ -127,11 +216,33 @@ public class EnemySpawner : MonoBehaviour
 
     private GameObject GetPrefabForMoveType(EnemyMoveType moveType)
     {
-        return moveType switch
+        // Search lanes for the matching move type
+        if (_lanes != null)
         {
-            EnemyMoveType.Walker => _walkerPrefab,
-            EnemyMoveType.Flyer => _flyerPrefab,
-            _ => _walkerPrefab // Fallback
-        };
+            foreach (var lane in _lanes)
+            {
+                if (lane.enemyData != null && lane.enemyData.moveType == moveType)
+                    return lane.prefab;
+            }
+        }
+
+        // Fallback: return first lane prefab if available
+        if (_lanes != null && _lanes.Length > 0 && _lanes[0].prefab != null)
+            return _lanes[0].prefab;
+
+        return null;
+    }
+
+    #endregion
+
+    /// <summary>
+    /// A spawn lane pairs a prefab with its EnemyData SO.
+    /// Each lane runs its own independent timer.
+    /// </summary>
+    [System.Serializable]
+    public class SpawnLane
+    {
+        public GameObject prefab;
+        public EnemyData enemyData;
     }
 }
