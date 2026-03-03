@@ -50,7 +50,7 @@ public class GameManager : MonoBehaviour
     [Header("Event Channels")]
     [SerializeField] private VoidEventChannel _onToolPickedUp;
     [SerializeField] private IntEventChannel _onScoreChanged;
-    [SerializeField] private IntEventChannel _onMilestoneReached;
+    [SerializeField] private ToolDataEventChannel _onMilestoneReached;
     [SerializeField] private ToolDataEventChannel _onToolEquipped;
     [SerializeField] private VoidEventChannel _onPlayerDied;
     [SerializeField] private VoidEventChannel _onGameOver;
@@ -69,8 +69,21 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         SceneManager.sceneLoaded += OnSceneLoaded;
 
-        // Load high score
-        HighScore = PlayerPrefs.GetInt("HighScore", 0);
+        // Load save data from JSON
+        SaveManager.Load();
+        HighScore = SaveManager.Data.highScore;
+
+        // Migrate legacy PlayerPrefs if present
+        int legacyScore = PlayerPrefs.GetInt("HighScore", 0);
+        if (legacyScore > HighScore)
+        {
+            HighScore = legacyScore;
+            SaveManager.Data.highScore = legacyScore;
+            SaveManager.Save();
+            PlayerPrefs.DeleteKey("HighScore");
+            PlayerPrefs.Save();
+            Debug.Log($"[GameManager] Migrated legacy PlayerPrefs highScore: {legacyScore}");
+        }
     }
 
     private void OnDestroy()
@@ -180,7 +193,7 @@ public class GameManager : MonoBehaviour
 
                 if (raiseMilestoneEvent)
                 {
-                    _onMilestoneReached?.Raise(tool.unlockScore);
+                    _onMilestoneReached?.Raise(tool);
 
                     // Milestone unlock SFX
                     if (SFXManager.Instance != null && SFXManager.Instance.MilestoneSFX != null)
@@ -224,8 +237,8 @@ public class GameManager : MonoBehaviour
         if (_score > HighScore)
         {
             HighScore = _score;
-            PlayerPrefs.SetInt("HighScore", HighScore);
-            // PlayerPrefs.Save() is omitted here for performance during gameplay, saved on GameOver instead.
+            SaveManager.Data.highScore = HighScore;
+            SaveManager.Save();
             
             UpdateUnlockedTools(true);
         }
@@ -253,8 +266,8 @@ public class GameManager : MonoBehaviour
         if (_score > HighScore)
         {
             HighScore = _score;
-            PlayerPrefs.SetInt("HighScore", HighScore);
-            PlayerPrefs.Save();
+            SaveManager.Data.highScore = HighScore;
+            SaveManager.Save();
         }
 
         _onGameOver?.Raise();
@@ -338,5 +351,17 @@ public class GameManager : MonoBehaviour
     {
         _currentState = newState;
         Debug.Log($"[GameManager] State changed to: {newState}");
+    }
+
+    /// <summary>
+    /// Reset high score to 0. Milestones will re-lock on next StartGame().
+    /// Call from console or debug UI for testing.
+    /// </summary>
+    [ContextMenu("Reset High Score")]
+    public void ResetHighScore()
+    {
+        SaveManager.ResetAll();
+        HighScore = 0;
+        Debug.Log("[GameManager] High score reset to 0. Restart the game to re-lock tools.");
     }
 }

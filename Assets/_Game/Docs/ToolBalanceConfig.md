@@ -75,7 +75,7 @@ Idle ──(Attack trigger)──► Phase1Attack ──(SecondaryPhase=true)─
 | Chainsaw | 1.0 | 0.0 |
 | Screwdriver | 1.0 | 0 |
 | Tape Measure | 0.5 | 0.0 |
-| Nail Gun | 1.0 | 0.0 |
+| Nail Gun | 0.5 | 0.0 |
 | Blowtorch | 1.0 | 0.0 |
 | Vacuum | 0.5 | 0.0 |
 | Magnet | 0.5 | 0.0 |

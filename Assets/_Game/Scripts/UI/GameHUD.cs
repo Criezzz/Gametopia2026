@@ -15,7 +15,7 @@ public class GameHUD : MonoBehaviour
     [SerializeField] private Image _toolIcon;
     [Header("Event Channels")]
     [SerializeField] private IntEventChannel _onScoreChanged;
-    [SerializeField] private IntEventChannel _onMilestoneReached;
+    [SerializeField] private ToolDataEventChannel _onMilestoneReached;
     [SerializeField] private ToolDataEventChannel _onToolEquipped;
 
     [Header("Milestone Flash")]
@@ -62,11 +62,12 @@ public class GameHUD : MonoBehaviour
             _scoreText.text = $"SCORE: {score}";
     }
 
-    private void OnMilestoneReached(int unlockScore)
+    private void OnMilestoneReached(ToolData tool)
     {
         if (_milestoneText != null)
         {
-            _milestoneText.text = $"NEW TOOL UNLOCKED ({unlockScore}+ SCORE)";
+            string toolName = tool != null ? tool.toolName : "???";
+            _milestoneText.text = $"{toolName} UNLOCKED!";
             _milestoneText.gameObject.SetActive(true);
             _milestoneTimer = _milestoneDisplayDuration;
         }
@@ -81,7 +82,7 @@ public class GameHUD : MonoBehaviour
     {
         if (_highScoreText != null)
         {
-            int highScore = PlayerPrefs.GetInt("HighScore", 0);
+            int highScore = SaveManager.Data.highScore;
             _highScoreText.text = $"BEST: {highScore}";
         }
     }
