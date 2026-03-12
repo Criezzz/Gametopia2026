@@ -1,11 +1,10 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 
-/// <summary>
-/// Pause menu. Toggle with Escape key.
-/// </summary>
+/// Pause menu. Toggle with Pause action (default: Escape).
 public class PauseUI : MonoBehaviour
 {
     [Header("UI Elements")]
@@ -13,6 +12,9 @@ public class PauseUI : MonoBehaviour
     [SerializeField] private Button _resumeButton;
     [SerializeField] private Button _restartButton;
     [SerializeField] private Button _mainMenuButton;
+
+    [Header("Input")]
+    [SerializeField] private InputActionReference _pauseAction;
 
     [Header("Event Channels")]
     [SerializeField] private VoidEventChannel _onGamePaused;
@@ -36,28 +38,26 @@ public class PauseUI : MonoBehaviour
 
     private void OnEnable()
     {
+        if (_pauseAction != null && _pauseAction.action != null)
+        {
+            _pauseAction.action.Enable();
+            _pauseAction.action.performed += OnPausePerformed;
+        }
     }
 
     private void OnDisable()
     {
+        if (_pauseAction != null && _pauseAction.action != null)
+            _pauseAction.action.performed -= OnPausePerformed;
     }
 
-    private void Start()
+    private void OnPausePerformed(InputAction.CallbackContext ctx)
     {
-        SetPanelVisible(false);
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            TogglePause();
-        }
+        TogglePause();
     }
 
     public void TogglePause()
     {
-        // Don't allow pausing during GameOver
         if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameState.GameOver)
             return;
 
@@ -81,11 +81,13 @@ public class PauseUI : MonoBehaviour
         _isPaused = false;
         Time.timeScale = 1f;
 
-        // Notify GameManager (optional cleanup), then always load directly
         if (_onGameRestart != null && _onGameRestart.HasListeners)
             _onGameRestart.Raise();
 
-        SceneManager.LoadScene("Game");
+        string sceneToLoad = GameManager.Instance != null 
+            ? GameManager.Instance.ActiveSceneName 
+            : SceneNames.Game;
+        SceneManager.LoadScene(sceneToLoad);
     }
 
     public void GoToMainMenu()
@@ -96,11 +98,11 @@ public class PauseUI : MonoBehaviour
 
         if (_onLoadScene != null && _onLoadScene.HasListeners)
         {
-            _onLoadScene.Raise("MainMenu");
+            _onLoadScene.Raise(SceneNames.MainMenu);
         }
         else
         {
-            SceneManager.LoadScene("MainMenu");
+            SceneManager.LoadScene(SceneNames.MainMenu);
         }
     }
 
@@ -120,3 +122,4 @@ public class PauseUI : MonoBehaviour
         }
     }
 }
+

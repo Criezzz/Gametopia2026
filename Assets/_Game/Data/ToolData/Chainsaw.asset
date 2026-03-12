@@ -20,7 +20,7 @@ MonoBehaviour:
   damage: 5
   secondaryDamage: 0
   cooldown: 0.1
-  attackParam: 3
+  attackParam: 2.5
   pierce: 0
   toolIcon: {fileID: 5881040114983578648, guid: 6f20c114a0a1bf04c979737d3f1e34b4, type: 3}
   toolSprite: {fileID: 5881040114983578648, guid: 6f20c114a0a1bf04c979737d3f1e34b4, type: 3}
@@ -29,4 +29,9 @@ MonoBehaviour:
   weaponHoldDistance: 0.5
   weaponYOffset: 0
   behaviorConfig: {fileID: 0}
-  attackSFX: {fileID: 0}
+  attackSFX: {fileID: 8300000, guid: 866c125cab0efc94caa2688442007680, type: 3}
+  secondaryAttackSFX: {fileID: 0}
+  hitSFX: {fileID: 0}
+  hitVFXPrefab: {fileID: 0}
+  hitTextPrefab: {fileID: 0}
+  hitTextSprites: []

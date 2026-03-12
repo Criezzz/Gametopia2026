@@ -30,7 +30,7 @@ public class HammerTool : BaseTool
             var enemy = hit.GetComponent<BaseEnemy>();
             if (enemy != null)
             {
-                enemy.TakeDamage(damage);
+                enemy.TakeDamage(damage, _toolData);
             }
         }
 

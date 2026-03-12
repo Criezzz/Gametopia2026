@@ -2,9 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// <summary>
-/// Handles async scene loading. Listens to a StringEventChannel for scene transitions.
-/// </summary>
+/// Async scene loader. Listens to a StringEventChannel for scene transitions.
 public class SceneLoader : MonoBehaviour
 {
     public static SceneLoader Instance { get; private set; }
@@ -53,6 +51,13 @@ public class SceneLoader : MonoBehaviour
         Debug.Log($"[SceneLoader] Loading scene: {sceneName}");
 
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
+        if (asyncLoad == null)
+        {
+            Debug.LogError($"[SceneLoader] Scene '{sceneName}' not found in Build Settings.");
+            _isLoading = false;
+            yield break;
+        }
+
         asyncLoad.allowSceneActivation = false;
 
         float elapsedTime = 0f;
@@ -74,9 +79,6 @@ public class SceneLoader : MonoBehaviour
         Debug.Log($"[SceneLoader] Scene loaded: {sceneName}");
     }
 
-    /// <summary>
-    /// Load a scene by build index (useful for boss progression).
-    /// </summary>
     public void LoadSceneByIndex(int buildIndex)
     {
         string scenePath = SceneUtility.GetScenePathByBuildIndex(buildIndex);

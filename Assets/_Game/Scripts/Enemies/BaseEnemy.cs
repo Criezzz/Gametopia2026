@@ -41,6 +41,10 @@ public class BaseEnemy : MonoBehaviour
     [Tooltip("Child GameObject with SpriteRenderer + Animator for angry VFX. Disabled by default, enabled on MarkAsRespawned.")]
     [SerializeField] private GameObject _angryVFX;
 
+    [Header("Contact Damage")]
+    [Tooltip("Layer(s) to detect for contact damage. Set to the Player layer.")]
+    [SerializeField] private LayerMask _playerLayer;
+
     private BoxCollider2D _boxCollider;
 
     protected SpriteRenderer _spriteRenderer;
@@ -107,7 +111,7 @@ public class BaseEnemy : MonoBehaviour
             _boxCollider.bounds.center,
             _boxCollider.bounds.size,
             0f,
-            1 << 0 // Default layer (Player)
+            _playerLayer
         );
 
         if (hit != null)
@@ -152,11 +156,21 @@ public class BaseEnemy : MonoBehaviour
         Destroy(gameObject);
     }
 
-    public virtual void TakeDamage(int damage)
+    public virtual void TakeDamage(int damage, ToolData toolData = null)
     {
         if (_isDead) return;
 
         _currentHP -= damage;
+
+        // Hit VFX & SFX from the tool that dealt the blow
+        if (toolData != null)
+        {
+            VFXSpawner.Spawn(toolData.hitVFXPrefab, transform.position);
+            SpawnHitText(toolData);
+
+            if (toolData.hitSFX != null && SFXManager.Instance != null)
+                SFXManager.Instance.Play(toolData.hitSFX);
+        }
 
         // Visual Hit Feedback
         if (_animator != null)
@@ -178,9 +192,21 @@ public class BaseEnemy : MonoBehaviour
         UpdateHealthBar();
     }
 
+    private void SpawnHitText(ToolData toolData)
+    {
+        if (toolData.hitTextPrefab == null || toolData.hitTextSprites == null
+            || toolData.hitTextSprites.Length == 0) return;
+
+        Sprite sprite = toolData.hitTextSprites[Random.Range(0, toolData.hitTextSprites.Length)];
+        Vector3 pos = transform.position + new Vector3(0f, 0.5f, 0f);
+        GameObject obj = Instantiate(toolData.hitTextPrefab, pos, Quaternion.identity);
+        var popup = obj.GetComponent<HitTextPopup>();
+        if (popup != null) popup.Setup(sprite);
+    }
+
     private IEnumerator HitFlashRoutine()
     {
-        Color originalColor = _isRespawned && _data != null ? _data.respawnTint : Color.white;
+        Color originalColor = Color.white;
 
         for (int i = 0; i < _hitFlashCount; i++)
         {
@@ -198,6 +224,10 @@ public class BaseEnemy : MonoBehaviour
         // Disable collider immediately to prevent phantom contact damage
         var col = GetComponent<Collider2D>();
         if (col != null) col.enabled = false;
+
+        // Death VFX from EnemyData
+        if (_data != null)
+            VFXSpawner.Spawn(_data.deathVFXPrefab, transform.position);
         
         // Broadcast Death Event
         _onEnemyKilled?.Raise();
@@ -312,9 +342,7 @@ public class BaseEnemy : MonoBehaviour
         if (_data.angrySprite != null && _spriteRenderer != null)
             _spriteRenderer.sprite = _data.angrySprite;
 
-        // Apply tint
-        if (_spriteRenderer != null)
-            _spriteRenderer.color = _data.respawnTint;
+        // No color tint — angry sprite already has distinct art
 
         // Trigger angry animation state via IsAngry bool parameter
         // The single animator controller handles the movingNormal -> movingAngry transition

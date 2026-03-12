@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Audio;
 
 /// <summary>
 /// Singleton SFX manager. Plays one-shot sound effects via a shared AudioSource.
@@ -12,6 +13,10 @@ using UnityEngine;
 public class SFXManager : MonoBehaviour
 {
     public static SFXManager Instance { get; private set; }
+
+    [Header("Audio Mixer")]
+    [Tooltip("Assign the SFX mixer group from the MainMixer.")]
+    [SerializeField] private AudioMixerGroup _sfxMixerGroup;
 
     [Header("Global SFX (not tied to any specific entity)")]
     [Tooltip("Played when the player picks up a toolbox")]
@@ -32,7 +37,11 @@ public class SFXManager : MonoBehaviour
             return;
         }
         Instance = this;
+        DontDestroyOnLoad(gameObject);
         _audioSource = GetComponent<AudioSource>();
+
+        if (_sfxMixerGroup != null)
+            _audioSource.outputAudioMixerGroup = _sfxMixerGroup;
     }
 
     /// <summary>

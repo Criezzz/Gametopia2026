@@ -18,13 +18,12 @@ MonoBehaviour:
   moveSpeed: 2
   contactDamage: 1
   gravityScale: 0
-  firstSpawnDelay: 6
-  spawnInterval: 5
-  difficultyTickInterval: 10
+  firstSpawnDelay: 10
+  spawnInterval: 7
+  difficultyTickInterval: 15
   intervalReductionPerTick: 0.2
-  minSpawnInterval: 2
-  respawnSpeedMultiplier: 2
-  respawnTint: {r: 1, g: 0.5, b: 0.2, a: 1}
+  minSpawnInterval: 3
+  respawnSpeedMultiplier: 1.5
   enemySprite: {fileID: 0}
   angrySprite: {fileID: 0}
   animatorController: {fileID: 9100000, guid: 14e5cef36039ea1488cb242cfaf9db37, type: 2}

@@ -17,7 +17,7 @@ MonoBehaviour:
   toolType: 3
   unlockScore: 50
   baseWeight: 95
-  damage: 1
+  damage: 2
   secondaryDamage: 0
   cooldown: 0.1
   attackParam: 50
@@ -29,4 +29,9 @@ MonoBehaviour:
   weaponHoldDistance: 0.5
   weaponYOffset: 0
   behaviorConfig: {fileID: 11400000, guid: 5baca22ad513e974e9ec9352d1128d23, type: 2}
-  attackSFX: {fileID: 0}
+  attackSFX: {fileID: 8300000, guid: 9d259b932dbf24b4f9a6aa9b8b53f8de, type: 3}
+  secondaryAttackSFX: {fileID: 0}
+  hitSFX: {fileID: 0}
+  hitVFXPrefab: {fileID: 0}
+  hitTextPrefab: {fileID: 0}
+  hitTextSprites: []

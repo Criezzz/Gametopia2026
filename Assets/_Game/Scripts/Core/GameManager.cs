@@ -3,9 +3,6 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// <summary>
-/// Game state enum for Tool Crate.
-/// </summary>
 public enum GameState
 {
     MainMenu,
@@ -14,10 +11,7 @@ public enum GameState
     GameOver
 }
 
-/// <summary>
-/// Singleton GameManager for Tool Crate.
-/// Manages score, tool pool (weighted by ToolData.baseWeight), unlocks, and game state.
-/// </summary>
+/// Singleton GameManager. Manages score, tool pool, unlocks, and game state.
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
@@ -31,6 +25,24 @@ public class GameManager : MonoBehaviour
     public int Score => _score;
     public int HighScore { get; private set; }
 
+    [Header("Game Mode")]
+    [SerializeField] private GameModeData _currentMode;
+    public GameModeData CurrentMode => _currentMode;
+
+    /// <summary>
+    /// Temporary storage for the mode chosen in the Main Menu, 
+    /// read by the Map Picker to know which scene to load.
+    /// Static so it survives without an instance (MainMenu has no GameManager).
+    /// </summary>
+    public static GameModeData PendingGameMode { get; set; }
+
+    public string ActiveSceneName => (_currentMode != null && !string.IsNullOrEmpty(_currentMode.sceneName)) 
+        ? _currentMode.sceneName 
+        : SceneNames.Game;
+    // Arena: per-player scores (index 0 = P1, index 1 = P2)
+    private int[] _arenaScores = new int[2];
+    public int GetArenaScore(int playerIndex) => _arenaScores[Mathf.Clamp(playerIndex, 0, 1)];
+
     [Header("Debug")]
     [Tooltip("If true, unlocks all tools immediately ignoring the High Score requirement.")]
     [SerializeField] private bool _devMode = false;
@@ -39,16 +51,16 @@ public class GameManager : MonoBehaviour
     [SerializeField] private ToolData[] _allTools;
     [SerializeField] private ToolData _firstPickupTool;
     private readonly HashSet<ToolData> _unlockedTools = new();
-    private ToolData _currentTool;
-    private bool _hasAwardedFirstPickupTool;
-    public ToolData CurrentTool => _currentTool;
+    private ToolData[] _playerTools = new ToolData[2];
+    private bool[] _hasAwardedFirstPickup = new bool[2];
+    public ToolData CurrentTool => _playerTools[0]; // Solo compat
 
     [Header("Toolbox")]
     [SerializeField] private Toolbox _toolboxPrefab;
     private Toolbox _toolboxInstance;
 
     [Header("Event Channels")]
-    [SerializeField] private VoidEventChannel _onToolPickedUp;
+    [SerializeField] private IntEventChannel _onToolPickedUp;
     [SerializeField] private IntEventChannel _onScoreChanged;
     [SerializeField] private ToolDataEventChannel _onMilestoneReached;
     [SerializeField] private ToolDataEventChannel _onToolEquipped;
@@ -56,6 +68,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private VoidEventChannel _onGameOver;
     [SerializeField] private VoidEventChannel _onGamePaused;
     [SerializeField] private VoidEventChannel _onGameRestart;
+    [SerializeField] private VoidEventChannel _onEnemyKilled;
 
     private void Awake()
     {
@@ -68,6 +81,10 @@ public class GameManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
         SceneManager.sceneLoaded += OnSceneLoaded;
+
+        // Apply pending mode chosen before this instance existed (MainMenu → MapPicker → Game)
+        if (PendingGameMode != null && _currentMode == null)
+            _currentMode = PendingGameMode;
 
         // Load save data from JSON
         SaveManager.Load();
@@ -98,41 +115,31 @@ public class GameManager : MonoBehaviour
         if (_onPlayerDied != null) _onPlayerDied.Register(HandlePlayerDied);
         if (_onGamePaused != null) _onGamePaused.Register(HandleGamePaused);
         if (_onGameRestart != null) _onGameRestart.Register(HandleGameRestart);
+        if (_onEnemyKilled != null) _onEnemyKilled.Register(HandleEnemyKilled);
     }
 
     private void Start()
     {
-        if (SceneManager.GetActiveScene().name == "Game" && _currentState != GameState.Playing)
+        string sceneName = SceneManager.GetActiveScene().name;
+        if ((sceneName == SceneNames.Game || sceneName == SceneNames.Arena) && _currentState != GameState.Playing)
             StartGame();
     }
 
+#if UNITY_EDITOR
     private void Update()
     {
-        bool pressed1 = Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1);
-        bool pressed2 = Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2);
-        bool pressed3 = Input.GetKeyDown(KeyCode.Alpha3) || Input.GetKeyDown(KeyCode.Keypad3);
-        bool pressed4 = Input.GetKeyDown(KeyCode.Alpha4) || Input.GetKeyDown(KeyCode.Keypad4);
-        bool pressed5 = Input.GetKeyDown(KeyCode.Alpha5) || Input.GetKeyDown(KeyCode.Keypad5);
-        bool pressed6 = Input.GetKeyDown(KeyCode.Alpha6) || Input.GetKeyDown(KeyCode.Keypad6);
-        bool pressed7 = Input.GetKeyDown(KeyCode.Alpha7) || Input.GetKeyDown(KeyCode.Keypad7);
-        bool pressed8 = Input.GetKeyDown(KeyCode.Alpha8) || Input.GetKeyDown(KeyCode.Keypad8);
+        if (!_devMode) return;
 
-        if (!_devMode)
+        for (int i = 0; i < 8; i++)
         {
-            if (pressed1 || pressed2 || pressed3 || pressed4 || pressed5 || pressed6 || pressed7 || pressed8)
-                Debug.LogWarning("[GameManager][DEV] Dev Mode is OFF. Enable it to use 1..8 tool hotkeys.");
-            return;
+            if (Input.GetKeyDown(KeyCode.Alpha1 + i) || Input.GetKeyDown(KeyCode.Keypad1 + i))
+            {
+                if (i == 0) DevEquipFirstTool();
+                else DevEquipToolByIndex(i);
+            }
         }
-
-        if (pressed1) DevEquipFirstTool();
-        if (pressed2) DevEquipToolByIndex(1);
-        if (pressed3) DevEquipToolByIndex(2);
-        if (pressed4) DevEquipToolByIndex(3);
-        if (pressed5) DevEquipToolByIndex(4);
-        if (pressed6) DevEquipToolByIndex(5);
-        if (pressed7) DevEquipToolByIndex(6);
-        if (pressed8) DevEquipToolByIndex(7);
     }
+#endif
 
     private void OnDisable()
     {
@@ -140,28 +147,34 @@ public class GameManager : MonoBehaviour
         if (_onPlayerDied != null) _onPlayerDied.Unregister(HandlePlayerDied);
         if (_onGamePaused != null) _onGamePaused.Unregister(HandleGamePaused);
         if (_onGameRestart != null) _onGameRestart.Unregister(HandleGameRestart);
+        if (_onEnemyKilled != null) _onEnemyKilled.Unregister(HandleEnemyKilled);
     }
 
-    /// <summary>
-    /// Initialize the run, unlock tools based on score, and start gameplay.
-    /// </summary>
+    /// Called by MapPickerUI before loading the game scene.
+    public void SetGameMode(GameModeData mode)
+    {
+        _currentMode = mode;
+    }
+
     public void StartGame()
     {
         _score = 0;
+        _arenaScores = new int[2];
         _unlockedTools.Clear();
-        _hasAwardedFirstPickupTool = false;
+        _hasAwardedFirstPickup = new bool[2];
+        _playerTools = new ToolData[2];
 
         UpdateUnlockedTools(false);
 
-        _currentTool = null;
         SetState(GameState.Playing);
         Time.timeScale = 1f;
 
-        // Spawn toolbox at a random platform position
         SpawnToolbox();
 
+        SaveManager.Data.totalGamesPlayed++;
+        SaveManager.Save();
+
         _onScoreChanged?.Raise(_score);
-        _onToolEquipped?.Raise(_currentTool);
     }
 
     private void SpawnToolbox()
@@ -203,17 +216,11 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Get a random tool from the unlocked pool (different from current if possible), using baseWeight.
-    /// </summary>
     public ToolData GetRandomTool()
     {
         if (_unlockedTools.Count == 0) return null;
 
-        var candidates = _unlockedTools.Where(t => t != _currentTool).ToList();
-        
-        if (candidates.Count == 0)
-            return _unlockedTools.First();
+        var candidates = _unlockedTools.ToList();
 
         float totalWeight = candidates.Sum(t => t.baseWeight);
         float rand = Random.Range(0f, totalWeight);
@@ -229,32 +236,45 @@ public class GameManager : MonoBehaviour
         return candidates.Last();
     }
 
-    private void HandleToolPickedUp()
+    private void HandleToolPickedUp(int playerIndex)
     {
-        _score++;
+        bool isArena = _currentMode != null && _currentMode.modeType == GameModeType.Arena;
 
-        // Save high score immediately so unlocked tools apply immediately if reached during a run
+        _score++;
+        SaveManager.Data.totalToolPickups++;
+        if (isArena)
+            _arenaScores[Mathf.Clamp(playerIndex, 0, 1)]++;
+
         if (_score > HighScore)
         {
             HighScore = _score;
             SaveManager.Data.highScore = HighScore;
             SaveManager.Save();
-            
+
             UpdateUnlockedTools(true);
         }
 
-        if (!_hasAwardedFirstPickupTool)
+        _onScoreChanged?.Raise(isArena ? _arenaScores[playerIndex] : _score);
+    }
+
+    /// Called by Toolbox to get the tool for a specific player.
+    public ToolData GetToolForPlayer(int playerIndex)
+    {
+        int idx = Mathf.Clamp(playerIndex, 0, 1);
+
+        ToolData tool;
+        if (!_hasAwardedFirstPickup[idx])
         {
-            _currentTool = ResolveFirstPickupTool();
-            _hasAwardedFirstPickupTool = true;
+            tool = ResolveFirstPickupTool();
+            _hasAwardedFirstPickup[idx] = true;
         }
         else
         {
-            _currentTool = GetRandomTool();
+            tool = GetRandomTool();
         }
 
-        _onScoreChanged?.Raise(_score);
-        _onToolEquipped?.Raise(_currentTool);
+        _playerTools[idx] = tool;
+        return tool;
     }
 
     private void HandlePlayerDied()
@@ -271,6 +291,12 @@ public class GameManager : MonoBehaviour
         }
 
         _onGameOver?.Raise();
+    }
+
+    private void HandleEnemyKilled()
+    {
+        SaveManager.Data.totalEnemiesKilled++;
+        SaveManager.Save();
     }
 
     private void HandleGamePaused()
@@ -297,9 +323,9 @@ public class GameManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if (scene.name == "Game" && _currentState != GameState.Playing)
+        if ((scene.name == SceneNames.Game || scene.name == SceneNames.Arena) && _currentState != GameState.Playing)
             StartGame();
-        else if (scene.name == "MainMenu")
+        else if (scene.name == SceneNames.MainMenu)
             SetState(GameState.MainMenu);
     }
 
@@ -312,8 +338,8 @@ public class GameManager : MonoBehaviour
         if (selectedTool == null)
             return;
 
-        _currentTool = selectedTool;
-        _onToolEquipped?.Raise(_currentTool);
+        _playerTools[0] = selectedTool;
+        Object.FindFirstObjectByType<PlayerToolHandler>()?.EquipTool(selectedTool);
         Debug.Log($"[GameManager][DEV] Equipped slot {index + 1}: {selectedTool.toolName}");
     }
 
@@ -326,8 +352,8 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        _currentTool = firstTool;
-        _onToolEquipped?.Raise(_currentTool);
+        _playerTools[0] = firstTool;
+        Object.FindFirstObjectByType<PlayerToolHandler>()?.EquipTool(firstTool);
         Debug.Log($"[GameManager][DEV] Equipped slot 1: {firstTool.toolName}");
     }
 
@@ -353,10 +379,6 @@ public class GameManager : MonoBehaviour
         Debug.Log($"[GameManager] State changed to: {newState}");
     }
 
-    /// <summary>
-    /// Reset high score to 0. Milestones will re-lock on next StartGame().
-    /// Call from console or debug UI for testing.
-    /// </summary>
     [ContextMenu("Reset High Score")]
     public void ResetHighScore()
     {

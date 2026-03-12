@@ -58,4 +58,16 @@ public class ToolData : ScriptableObject
 
     [Header("Audio")]
     public AudioClip attackSFX;
+    [Tooltip("Sound played at Phase 2 shoot — fires once per enemy shot (used by Vacuum)")]
+    public AudioClip secondaryAttackSFX;
+    [Tooltip("Sound played when this tool hits an enemy")]
+    public AudioClip hitSFX;
+
+    [Header("VFX")]
+    [Tooltip("Particle prefab spawned at enemy position on hit")]
+    public GameObject hitVFXPrefab;
+    [Tooltip("Prefab with HitTextPopup + SpriteRenderer (white sprite). Spawned on hit.")]
+    public GameObject hitTextPrefab;
+    [Tooltip("White pixel-art text sprites (WHACK, POW, BAM…). One picked at random per hit.")]
+    public Sprite[] hitTextSprites;
 }

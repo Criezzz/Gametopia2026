@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 73f9dfd14eaa963448ff4aee1d2cba46, type: 3}
+  m_Script: {fileID: 11500000, guid: ce3d6b2fcfc84034c83f23da257990d8, type: 3}
   m_Name: OnToolPickedUp
-  m_EditorClassIdentifier: Assembly-CSharp::VoidEventChannel
+  m_EditorClassIdentifier: Assembly-CSharp::IntEventChannel
   _description: 

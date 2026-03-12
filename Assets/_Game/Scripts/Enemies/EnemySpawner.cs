@@ -111,7 +111,7 @@ public class EnemySpawner : MonoBehaviour
             _spawnTimers[i] -= Time.deltaTime;
             if (_spawnTimers[i] <= 0f)
             {
-                SpawnEnemy(lane.prefab);
+                SpawnEnemy(lane.prefab, lane.enemyData);
                 _spawnTimers[i] = _currentIntervals[i];
             }
         }
@@ -156,9 +156,21 @@ public class EnemySpawner : MonoBehaviour
 
     private IEnumerator SpawnHordeRoutine()
     {
+        if (_hordeConfig.enemyPrefab == null || Camera.main == null) yield break;
+
+        // All horde enemies share the same spawn position and direction
+        float x = Random.value < 0.5f ? _spawnXLeft : _spawnXRight;
+        float y = Camera.main.transform.position.y + Camera.main.orthographicSize + _spawnYOffset;
+        Vector2 spawnPos = new Vector2(x, y);
+        int sharedDirection = Random.value > 0.5f ? 1 : -1;
+
         for (int i = 0; i < _hordeConfig.enemyCount; i++)
         {
-            SpawnEnemy(_hordeConfig.enemyPrefab);
+            GameObject enemy = Instantiate(_hordeConfig.enemyPrefab, spawnPos, Quaternion.identity);
+
+            // Force same walk direction so they form a chain
+            WalkerEnemy walker = enemy.GetComponent<WalkerEnemy>();
+            if (walker != null) walker.SetDirection(sharedDirection);
 
             if (i < _hordeConfig.enemyCount - 1)
                 yield return new WaitForSeconds(_hordeConfig.delayBetweenSpawns);
@@ -169,13 +181,17 @@ public class EnemySpawner : MonoBehaviour
 
     #region Spawn Helpers
 
-    private void SpawnEnemy(GameObject prefab)
+    private void SpawnEnemy(GameObject prefab, EnemyData data = null)
     {
         if (prefab == null || Camera.main == null) return;
 
-        float x = Random.Range(_spawnXLeft, _spawnXRight);
+        float x = Random.value < 0.5f ? _spawnXLeft : _spawnXRight;
         float y = Camera.main.transform.position.y + Camera.main.orthographicSize + _spawnYOffset;
-        Instantiate(prefab, new Vector2(x, y), Quaternion.identity);
+        Vector3 pos = new Vector2(x, y);
+        Instantiate(prefab, pos, Quaternion.identity);
+
+        if (data != null)
+            VFXSpawner.Spawn(data.spawnVFXPrefab, pos);
     }
 
     #endregion
@@ -197,7 +213,7 @@ public class EnemySpawner : MonoBehaviour
             return;
         }
 
-        float x = Random.Range(_spawnXLeft, _spawnXRight);
+        float x = Random.value < 0.5f ? _spawnXLeft : _spawnXRight;
         float y = Camera.main.transform.position.y + Camera.main.orthographicSize + _spawnYOffset;
 
         GameObject newEnemy = Instantiate(prefab, new Vector2(x, y), Quaternion.identity);

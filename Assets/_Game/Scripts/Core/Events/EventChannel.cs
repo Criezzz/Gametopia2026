@@ -3,11 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-/// <summary>
-/// Generic ScriptableObject event channel with typed payload.
-/// Uses HashSet to prevent duplicate listener registration.
-/// Concrete subclasses required for Unity serialization.
-/// </summary>
+/// Generic SO event channel with typed payload. Concrete subclasses needed for Unity serialization.
 public abstract class EventChannel<T> : ScriptableObject
 {
     private readonly HashSet<Action<T>> _listeners = new();

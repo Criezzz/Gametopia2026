@@ -1,8 +1,11 @@
 using UnityEngine;
 
 /// <summary>
-/// Chainsaw: Continuous melee, 5 damage per 0.1s tick, 2u range.
-/// Hold to keep damaging.
+/// Chainsaw: Hold to attack. 3-phase animation:
+///   1. Press   → chainsaw starts up  (Start clip)
+///   2. Hold    → chainsaw loops      (Loop clip, repeats)
+///   3. Release → chainsaw winds down (End clip)
+/// Continuous melee, 5 damage per 0.1s tick, 2u range.
 /// </summary>
 public class ChainsawTool : BaseTool
 {
@@ -10,17 +13,26 @@ public class ChainsawTool : BaseTool
     [SerializeField] private LayerMask _enemyLayer;
 
     private float _range = 2f;
+    private bool _isHolding;
 
     public override void Initialize(ToolData data, PlayerController player)
     {
         base.Initialize(data, player);
         _range = data != null ? data.attackParam : 2f;
+        _isHolding = false;
     }
 
     public override void Attack()
     {
         if (!CanAttack()) return;
-        PlayAttackSFX();
+
+        // First frame of hold — start the animation
+        if (!_isHolding)
+        {
+            _isHolding = true;
+            PlayAttackSFX();
+            OnRequestStartHold?.Invoke();
+        }
 
         _isAttacking = true;
 
@@ -39,11 +51,27 @@ public class ChainsawTool : BaseTool
             var enemy = hit.GetComponent<BaseEnemy>();
             if (enemy != null)
             {
-                enemy.TakeDamage(damage);
+                enemy.TakeDamage(damage, _toolData);
             }
         }
 
         StartCooldown();
+    }
+
+    public override void StopAttack()
+    {
+        if (_isHolding)
+        {
+            _isHolding = false;
+            OnRequestStopHold?.Invoke();
+        }
+        base.StopAttack();
+    }
+
+    public override void OnUnequip()
+    {
+        _isHolding = false;
+        base.OnUnequip();
     }
 
     private void OnDrawGizmosSelected()

@@ -16,7 +16,7 @@ MonoBehaviour:
   description: Suck small enemies in, then shoot them out as projectiles.
   toolType: 2
   unlockScore: 36
-  baseWeight: 95
+  baseWeight: 97
   damage: 10
   secondaryDamage: 0
   cooldown: 0
@@ -27,6 +27,11 @@ MonoBehaviour:
   attackPrefab: {fileID: 642482346178011729, guid: ab4c3875982c2c749aae375eb53c49ba, type: 3}
   attackAnimator: {fileID: 9100000, guid: f694f0b48df0ee24d893942dcacad372, type: 2}
   weaponHoldDistance: 0.5
-  weaponYOffset: 0
+  weaponYOffset: 0.2
   behaviorConfig: {fileID: 11400000, guid: ee1213571f5e87541b7d609a5d7dc934, type: 2}
-  attackSFX: {fileID: 0}
+  attackSFX: {fileID: 8300000, guid: e89a99d98be5c6444b3d2e84e664d56f, type: 3}
+  secondaryAttackSFX: {fileID: 8300000, guid: c777257f18408fd43a0a5f0707e0f50b, type: 3}
+  hitSFX: {fileID: 0}
+  hitVFXPrefab: {fileID: 0}
+  hitTextPrefab: {fileID: 0}
+  hitTextSprites: []

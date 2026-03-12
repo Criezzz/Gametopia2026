@@ -16,7 +16,7 @@ MonoBehaviour:
   description: Throw a screwdriver. Fast cooldown.
   toolType: 1
   unlockScore: 1
-  baseWeight: 100
+  baseWeight: 93
   damage: 4
   secondaryDamage: 0
   cooldown: 0.3
@@ -29,4 +29,9 @@ MonoBehaviour:
   weaponHoldDistance: 1
   weaponYOffset: 0
   behaviorConfig: {fileID: 0}
-  attackSFX: {fileID: 0}
+  attackSFX: {fileID: 8300000, guid: 7803b04492be0474cb2b4d37e96199fb, type: 3}
+  secondaryAttackSFX: {fileID: 0}
+  hitSFX: {fileID: 0}
+  hitVFXPrefab: {fileID: 0}
+  hitTextPrefab: {fileID: 0}
+  hitTextSprites: []

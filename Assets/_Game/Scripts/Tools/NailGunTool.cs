@@ -29,7 +29,7 @@ public class NailGunTool : BaseTool
         {
             GameObject nail = Instantiate(prefab, origin, Quaternion.identity);
             var proj = nail.GetComponent<ToolProjectile>();
-            proj.Initialize(dir, _nailSpeed, damage, false);
+            proj.Initialize(dir, _nailSpeed, damage, false, _toolData);
         }
 
         StartCooldown();

@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb06691e579ec06458e1286511c245f2, type: 3}
   m_Name: DefaultPlayerData
   m_EditorClassIdentifier: Assembly-CSharp::PlayerData
-  moveSpeed: 13
-  maxJumpHeight: 4
+  moveSpeed: 11
+  maxJumpHeight: 4.3
   timeToMaxHeight: 0.3
-  jumpCutMultiplier: 0.6
-  fallGravityMultiplier: 1.3
+  jumpCutMultiplier: 0.567
+  fallGravityMultiplier: 1.2
   maxFallSpeed: 36
-  groundCheckRadius: 0.15
+  groundCheckRadius: 0.2
   groundLayer:
     serializedVersion: 2
     m_Bits: 256

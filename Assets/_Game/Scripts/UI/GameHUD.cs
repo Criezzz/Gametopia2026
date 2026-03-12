@@ -60,16 +60,26 @@ public class GameHUD : MonoBehaviour
     {
         if (_scoreText != null)
             _scoreText.text = $"SCORE: {score}";
+
+        // Refresh best score in case this score beat it
+        UpdateHighScore();
     }
 
     private void OnMilestoneReached(ToolData tool)
     {
+        Debug.Log($"[GameHUD] OnMilestoneReached fired — tool: {(tool != null ? tool.toolName : "null")}");
+
         if (_milestoneText != null)
         {
             string toolName = tool != null ? tool.toolName : "???";
             _milestoneText.text = $"{toolName} UNLOCKED!";
             _milestoneText.gameObject.SetActive(true);
             _milestoneTimer = _milestoneDisplayDuration;
+            Debug.Log($"[GameHUD] Milestone text shown: {toolName} UNLOCKED!");
+        }
+        else
+        {
+            Debug.LogWarning("[GameHUD] _milestoneText is null! Assign it in the Inspector.");
         }
     }
 

@@ -4,19 +4,23 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 
-/// <summary>
 /// Game Over screen. Shows final score, high score, and restart button.
-/// Listens to OnGameOver event to activate.
-/// Uses direct mouse/touch detection as primary input (bypasses EventSystem
-/// entirely for maximum reliability).
-/// </summary>
 public class GameOverUI : MonoBehaviour
 {
     [Header("UI Elements")]
     [SerializeField] private GameObject _panel;
+    [SerializeField] private GameObject _gameOverTitle;
     [SerializeField] private TextMeshProUGUI _finalScoreText;
     [SerializeField] private TextMeshProUGUI _highScoreText;
     [SerializeField] private TextMeshProUGUI _newHighScoreLabel;
+
+    [Header("Arena UI Elements")]
+    [SerializeField] private GameObject _arenaScoreContainer;
+    [SerializeField] private TextMeshProUGUI _p1ScoreText;
+    [SerializeField] private TextMeshProUGUI _p2ScoreText;
+    [SerializeField] private TextMeshProUGUI _winnerText;
+
+    [Header("Buttons")]
     [SerializeField] private Button _restartButton;
     [SerializeField] private Button _mainMenuButton;
 
@@ -80,16 +84,48 @@ public class GameOverUI : MonoBehaviour
 
         Time.timeScale = 0f;
 
-        int highScore = PlayerPrefs.GetInt("HighScore", 0);
+        bool isArena = GameManager.Instance != null &&
+                       GameManager.Instance.CurrentMode != null &&
+                       GameManager.Instance.CurrentMode.modeType == GameModeType.Arena;
 
-        if (_finalScoreText != null)
-            _finalScoreText.text = $"SCORE: {_latestScore}";
+        // Toggle Solo vs Arena containers
+        if (_gameOverTitle != null) _gameOverTitle.SetActive(!isArena);
+        if (_finalScoreText != null) _finalScoreText.gameObject.SetActive(!isArena);
+        if (_highScoreText != null) _highScoreText.gameObject.SetActive(!isArena);
+        if (_newHighScoreLabel != null) _newHighScoreLabel.gameObject.SetActive(false); // Default to off
+        if (_arenaScoreContainer != null) _arenaScoreContainer.SetActive(isArena);
 
-        if (_highScoreText != null)
-            _highScoreText.text = $"BEST: {highScore}";
+        int highScore = SaveManager.Data.highScore;
 
-        if (_newHighScoreLabel != null)
-            _newHighScoreLabel.gameObject.SetActive(_latestScore >= highScore && _latestScore > 0);
+        if (isArena)
+        {
+            int p1Score = GameManager.Instance.GetArenaScore(0);
+            int p2Score = GameManager.Instance.GetArenaScore(1);
+
+            if (_p1ScoreText != null) _p1ScoreText.text = $"P1 SCORE: {p1Score}";
+            if (_p2ScoreText != null) _p2ScoreText.text = $"P2 SCORE: {p2Score}";
+
+            if (_winnerText != null)
+            {
+                if (p1Score > p2Score)
+                    _winnerText.text = "PLAYER 1 WINS!";
+                else if (p2Score > p1Score)
+                    _winnerText.text = "PLAYER 2 WINS!";
+                else
+                    _winnerText.text = "DRAW!";
+            }
+        }
+        else
+        {
+            if (_finalScoreText != null)
+                _finalScoreText.text = $"SCORE: {_latestScore}";
+
+            if (_highScoreText != null)
+                _highScoreText.text = $"BEST: {highScore}";
+
+            if (_newHighScoreLabel != null)
+                _newHighScoreLabel.gameObject.SetActive(_latestScore >= highScore && _latestScore > 0);
+        }
 
         // Force EventSystem to recognize the restart button (secondary mechanism)
         if (_restartButton != null && EventSystem.current != null)
@@ -108,16 +144,14 @@ public class GameOverUI : MonoBehaviour
     {
         if (!_isVisible || _isTransitioning) return;
 
-        // ===== PRIMARY: Direct mouse click detection (bypasses EventSystem) =====
+        // Direct mouse click detection (bypasses EventSystem for reliability)
         if (Input.GetMouseButtonDown(0))
         {
             Vector2 mousePos = Input.mousePosition;
 
-            // Screen Space Overlay canvas: camera parameter = null
             if (_restartRT != null &&
                 RectTransformUtility.RectangleContainsScreenPoint(_restartRT, mousePos, null))
             {
-                Debug.Log("[GameOverUI] Direct click detected on RESTART.");
                 DoRestart();
                 return;
             }
@@ -125,34 +159,17 @@ public class GameOverUI : MonoBehaviour
             if (_mainMenuRT != null &&
                 RectTransformUtility.RectangleContainsScreenPoint(_mainMenuRT, mousePos, null))
             {
-                Debug.Log("[GameOverUI] Direct click detected on MAIN MENU.");
                 DoMainMenu();
                 return;
             }
         }
-
-        // ===== SECONDARY: Keyboard shortcuts =====
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            DoRestart();
-        }
-        else if (Input.GetKeyDown(KeyCode.M))
-        {
-            DoMainMenu();
-        }
     }
 
-    /// <summary>
-    /// Called by Button.onClick (persistent or runtime). Kept as fallback.
-    /// </summary>
     public void OnRestartClicked()
     {
         DoRestart();
     }
 
-    /// <summary>
-    /// Called by Button.onClick (persistent or runtime). Kept as fallback.
-    /// </summary>
     public void OnMainMenuClicked()
     {
         DoMainMenu();
@@ -171,7 +188,10 @@ public class GameOverUI : MonoBehaviour
         if (_onGameRestart != null && _onGameRestart.HasListeners)
             _onGameRestart.Raise();
 
-        SceneManager.LoadScene("Game");
+        string sceneToLoad = GameManager.Instance != null 
+            ? GameManager.Instance.ActiveSceneName 
+            : SceneNames.Game;
+        SceneManager.LoadScene(sceneToLoad);
     }
 
     private void DoMainMenu()
@@ -186,11 +206,11 @@ public class GameOverUI : MonoBehaviour
 
         if (_onLoadScene != null && _onLoadScene.HasListeners)
         {
-            _onLoadScene.Raise("MainMenu");
+            _onLoadScene.Raise(SceneNames.MainMenu);
         }
         else
         {
-            SceneManager.LoadScene("MainMenu");
+            SceneManager.LoadScene(SceneNames.MainMenu);
         }
     }
 

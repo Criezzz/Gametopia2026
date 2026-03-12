@@ -16,13 +16,12 @@ MonoBehaviour:
   description: Whip forward 4 units. Hits on extend and retract.
   toolType: 1
   unlockScore: 5
-  baseWeight: 100
-  damage: 3
+  baseWeight: 97
+  damage: 5
   secondaryDamage: 5
-  cooldown: 0.5
+  cooldown: 0.4
   attackParam: 4
   pierce: 1
-  knockback: 0.5
   toolIcon: {fileID: -347949138, guid: 9fabe08986df08f4ba3d8c28ffc01763, type: 3}
   toolSprite: {fileID: -347949138, guid: 9fabe08986df08f4ba3d8c28ffc01763, type: 3}
   attackPrefab: {fileID: 0}
@@ -30,4 +29,9 @@ MonoBehaviour:
   weaponHoldDistance: 0.5
   weaponYOffset: 0
   behaviorConfig: {fileID: 0}
-  attackSFX: {fileID: 0}
+  attackSFX: {fileID: 8300000, guid: b7337e9daf135b34fbe307782af1175f, type: 3}
+  secondaryAttackSFX: {fileID: 0}
+  hitSFX: {fileID: 0}
+  hitVFXPrefab: {fileID: 0}
+  hitTextPrefab: {fileID: 0}
+  hitTextSprites: []

@@ -13,6 +13,7 @@ public class ToolProjectile : MonoBehaviour
     private float _timer;
     private float _lifetime = 5f;
     private Rigidbody2D _rb;
+    private ToolData _toolData;
     private static readonly int GroundLayer = 8;
 
     private void Awake()
@@ -20,10 +21,11 @@ public class ToolProjectile : MonoBehaviour
         _rb = GetComponent<Rigidbody2D>();
     }
 
-    public void Initialize(Vector2 direction, float speed, int damage, bool pierce)
+    public void Initialize(Vector2 direction, float speed, int damage, bool pierce, ToolData toolData = null)
     {
         _damage = damage;
         _pierce = pierce;
+        _toolData = toolData;
         _timer = _lifetime;
 
         Vector2 dir = direction.normalized;
@@ -58,7 +60,7 @@ public class ToolProjectile : MonoBehaviour
         var enemy = other.GetComponent<BaseEnemy>();
         if (enemy != null)
         {
-            enemy.TakeDamage(_damage);
+            enemy.TakeDamage(_damage, _toolData);
             if (!_pierce)
                 Destroy(gameObject);
         }

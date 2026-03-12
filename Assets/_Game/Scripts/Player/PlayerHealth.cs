@@ -1,9 +1,6 @@
 using UnityEngine;
 
-/// <summary>
-/// Manages player death. One hit = die game over.
-/// Raises OnPlayerDied event.
-/// </summary>
+/// Player health. One-hit kill. Raises OnPlayerDied event.
 public class PlayerHealth : MonoBehaviour
 {
     [Header("Event Channels")]

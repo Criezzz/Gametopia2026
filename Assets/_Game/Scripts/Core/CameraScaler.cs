@@ -1,16 +1,15 @@
 using UnityEngine;
 
-/// <summary>
-/// Custom pixel-perfect camera scaler.
-/// Sets orthographic size based on screen resolution, scale factor, and PPU.
-/// Formula: orthoSize = (Screen.currentResolution.height / (scale * PPU)) * 0.5f
-/// </summary>
+/// Pixel-perfect camera scaler. Uses a fixed reference height for consistent ortho size.
 [RequireComponent(typeof(Camera))]
 public class CameraScaler : MonoBehaviour
 {
     [Header("Pixel Settings")]
     [SerializeField] private int _ppu = 16;
-    [SerializeField] private int _scale = 6; // 1080 / 180 = 6x scale for Full HD
+    [SerializeField] private int _scale = 6;
+
+    [Header("Reference Resolution")]
+    [SerializeField] private int _referenceHeight = 1080;
 
     private Camera _camera;
 
@@ -21,15 +20,9 @@ public class CameraScaler : MonoBehaviour
         UpdateOrthoSize();
     }
 
-    private void Update()
-    {
-        // Recalculate if resolution changes (e.g. window resize)
-        UpdateOrthoSize();
-    }
-
     private void UpdateOrthoSize()
     {
-        float orthoSize = (Screen.currentResolution.height / (float)(_scale * _ppu)) * 0.5f;
+        float orthoSize = (_referenceHeight / (float)(_scale * _ppu)) * 0.5f;
         _camera.orthographicSize = orthoSize;
     }
 
@@ -38,6 +31,7 @@ public class CameraScaler : MonoBehaviour
     {
         if (_ppu <= 0) _ppu = 16;
         if (_scale <= 0) _scale = 1;
+        if (_referenceHeight <= 0) _referenceHeight = 1080;
     }
 #endif
 }

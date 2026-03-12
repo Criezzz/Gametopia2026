@@ -16,13 +16,12 @@ MonoBehaviour:
   description: Heavy melee swing. Smash enemies in front.
   toolType: 0
   unlockScore: 0
-  baseWeight: 100
+  baseWeight: 85
   damage: 8
   secondaryDamage: 0
   cooldown: 0.7
-  attackParam: 2
+  attackParam: 3
   pierce: 0
-  knockback: 1
   toolIcon: {fileID: -1159298483449069950, guid: 544f5c758f24f784e95e75034da72cd0, type: 3}
   toolSprite: {fileID: -1159298483449069950, guid: 544f5c758f24f784e95e75034da72cd0, type: 3}
   attackPrefab: {fileID: 0}
@@ -30,4 +29,12 @@ MonoBehaviour:
   weaponHoldDistance: 1
   weaponYOffset: 0.2
   behaviorConfig: {fileID: 0}
-  attackSFX: {fileID: 0}
+  attackSFX: {fileID: 8300000, guid: 1fdbb6a131df3ad45a154180b60e47a4, type: 3}
+  secondaryAttackSFX: {fileID: 0}
+  hitSFX: {fileID: 0}
+  hitVFXPrefab: {fileID: 8378573448782073372, guid: 7367bdd0441b6514e8ea07f8edde1abb, type: 3}
+  hitTextPrefab: {fileID: 429878832413004069, guid: 1c495891e77ceb3449731dbe9cae7539, type: 3}
+  hitTextSprites:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}

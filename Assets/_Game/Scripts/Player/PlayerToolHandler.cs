@@ -1,25 +1,23 @@
 using UnityEngine;
 
-/// <summary>
-/// Manages the player's current tool.
-/// Listens for attack input, delegates to the active BaseTool.
-/// Handles tool swapping on toolbox pickup.
-/// </summary>
+/// Manages the player's active tool. Handles attack input delegation and tool swapping.
 public class PlayerToolHandler : MonoBehaviour
 {
+    [System.Serializable]
+    public struct ToolBinding
+    {
+        [Tooltip("Drag the ToolData SO for this tool.")]
+        public ToolData data;
+        [Tooltip("Drag the matching BaseTool component from this GameObject.")]
+        public BaseTool component;
+    }
+
     [Header("Default Tool")]
     [SerializeField] private ToolData _defaultToolData; // Legacy fallback, not auto-equipped at start.
 
-    [Header("Tool Prefab Mapping")]
-    [Tooltip("Prefab containing all tool scripts. Tools are enabled/disabled on swap.")]
-    [SerializeField] private HammerTool _hammerTool;
-    [SerializeField] private ScrewdriverTool _screwdriverTool;
-    [SerializeField] private TapeMeasureTool _tapeMeasureTool;
-    [SerializeField] private NailGunTool _nailGunTool;
-    [SerializeField] private BlowtorchTool _blowtorchTool;
-    [SerializeField] private VacuumTool _vacuumTool;
-    [SerializeField] private MagnetTool _magnetTool;
-    [SerializeField] private ChainsawTool _chainsawTool;
+    [Header("Tool Bindings")]
+    [Tooltip("Map each ToolData SO to its BaseTool component. Assign in Inspector.")]
+    [SerializeField] private ToolBinding[] _toolBindings;
 
     [Header("Event Channels")]
     [SerializeField] private ToolDataEventChannel _onToolEquipped;
@@ -31,25 +29,21 @@ public class PlayerToolHandler : MonoBehaviour
     [SerializeField] private int _weaponSortingOrderOffset = 3;
 
     private PlayerController _playerController;
+    private PlayerInputHandler _inputHandler;
     private BaseTool _currentTool;
     private ToolData _currentToolData;
 
     public ToolData CurrentToolData => _currentToolData;
     private static readonly int AttackHash = Animator.StringToHash("Attack");
     private static readonly int SecondaryPhaseHash = Animator.StringToHash("SecondaryPhase");
+    private static readonly int IsHoldingHash = Animator.StringToHash("IsHolding");
 
-    /// <summary>
-    /// Called by PlayerHealth when the player dies. Hides weapon and stops updates.
-    /// </summary>
     public void OnPlayerDied()
     {
         if (_weaponSpriteRenderer != null) _weaponSpriteRenderer.enabled = false;
         enabled = false;
     }
 
-    /// <summary>
-    /// Called by PlayerHealth when the player resets (scene reload etc).
-    /// </summary>
     public void OnPlayerReset()
     {
         enabled = true;
@@ -58,19 +52,16 @@ public class PlayerToolHandler : MonoBehaviour
     private void Awake()
     {
         _playerController = GetComponent<PlayerController>();
+        _inputHandler = GetComponent<PlayerInputHandler>();
         ValidateWeaponVisualSetup();
     }
 
     private void OnEnable()
     {
-        if (_onToolEquipped != null)
-            _onToolEquipped.Register(HandleToolEquipped);
     }
 
     private void OnDisable()
     {
-        if (_onToolEquipped != null)
-            _onToolEquipped.Unregister(HandleToolEquipped);
     }
 
     private void Start()
@@ -83,10 +74,10 @@ public class PlayerToolHandler : MonoBehaviour
     {
         UpdateWeaponVisualTransform();
 
-        if (_currentTool == null)
+        if (_currentTool == null || _inputHandler == null)
             return;
 
-        if (Input.GetKey(KeyCode.J))
+        if (_inputHandler.AttackHeld)
         {
             if (_currentTool.CanAttack())
             {
@@ -95,15 +86,12 @@ public class PlayerToolHandler : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyUp(KeyCode.J))
+        if (_inputHandler.AttackReleased)
         {
             _currentTool.StopAttack();
         }
     }
 
-    /// <summary>
-    /// Swap to a new tool. Called by GameManager when toolbox is picked up.
-    /// </summary>
     public void EquipTool(ToolData newToolData)
     {
         if (newToolData == null)
@@ -129,6 +117,8 @@ public class PlayerToolHandler : MonoBehaviour
             tool.enabled = true;
             tool.OnRequestSecondaryAnimation = PlaySecondaryAnimation;
             tool.OnRequestPrimaryAnimation = PlayPrimaryAnimation;
+            tool.OnRequestStartHold = StartHoldAnimation;
+            tool.OnRequestStopHold = StopHoldAnimation;
             tool.Initialize(newToolData, _playerController);
             _currentTool = tool;
             Debug.Log($"[PlayerToolHandler] Equipped: {newToolData.toolName}");
@@ -137,6 +127,8 @@ public class PlayerToolHandler : MonoBehaviour
         {
             Debug.LogWarning($"[PlayerToolHandler] No tool component found for: {newToolData.toolName}");
         }
+
+        _onToolEquipped?.Raise(newToolData);
     }
 
     private void ClearTool()
@@ -205,6 +197,18 @@ public class PlayerToolHandler : MonoBehaviour
         float x = facing * holdDist;
         _weaponVisualRoot.localPosition = new Vector3(x, yOffset, 0f);
 
+        // Counteract parent scale so the weapon keeps its original world-space size
+        // even when the player GameObject is scaled (e.g. 0.7).
+        if (_weaponVisualRoot.parent != null)
+        {
+            Vector3 ps = _weaponVisualRoot.parent.lossyScale;
+            _weaponVisualRoot.localScale = new Vector3(
+                ps.x != 0f ? 1f / ps.x : 1f,
+                ps.y != 0f ? 1f / ps.y : 1f,
+                ps.z != 0f ? 1f / ps.z : 1f
+            );
+        }
+
         if (_weaponSpriteRenderer != null)
             _weaponSpriteRenderer.flipX = facing < 0;
     }
@@ -224,47 +228,39 @@ public class PlayerToolHandler : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Set SecondaryPhase = true so the animator transitions to the phase-2 state.
-    /// Called by multi-phase tools (Tape retract, Vacuum shoot).
-    /// </summary>
+    // Transition to secondary animation state (multi-phase tools).
     private void PlaySecondaryAnimation()
     {
         if (_weaponAnimator == null || _weaponAnimator.runtimeAnimatorController == null) return;
         _weaponAnimator.SetBool(SecondaryPhaseHash, true);
     }
 
-    /// <summary>
-    /// Set SecondaryPhase = false so the animator returns to idle / phase-1 ready.
-    /// Called when multi-phase attack completes.
-    /// </summary>
     private void PlayPrimaryAnimation()
     {
         if (_weaponAnimator == null || _weaponAnimator.runtimeAnimatorController == null) return;
         _weaponAnimator.SetBool(SecondaryPhaseHash, false);
     }
 
+    private void StartHoldAnimation()
+    {
+        if (_weaponAnimator == null || _weaponAnimator.runtimeAnimatorController == null) return;
+        _weaponAnimator.SetBool(IsHoldingHash, true);
+    }
+
+    private void StopHoldAnimation()
+    {
+        if (_weaponAnimator == null || _weaponAnimator.runtimeAnimatorController == null) return;
+        _weaponAnimator.SetBool(IsHoldingHash, false);
+    }
+
     private BaseTool GetToolComponent(ToolData data)
     {
-        // Match by tool type + name
-        switch (data.toolType)
+        if (_toolBindings == null) return null;
+
+        foreach (var binding in _toolBindings)
         {
-            case ToolType.Melee:
-                if (data.toolName == "Hammer") return _hammerTool;
-                if (data.toolName == "Chainsaw") return _chainsawTool;
-                break;
-            case ToolType.Ranged:
-                if (data.toolName == "Screwdriver") return _screwdriverTool;
-                if (data.toolName == "Tape Measure") return _tapeMeasureTool;
-                if (data.toolName == "Nail Gun") return _nailGunTool;
-                break;
-            case ToolType.Beam:
-                if (data.toolName == "Blowtorch") return _blowtorchTool;
-                if (data.toolName == "Magnet") return _magnetTool;
-                break;
-            case ToolType.Utility:
-                if (data.toolName == "Vacuum") return _vacuumTool;
-                break;
+            if (binding.data == data && binding.component != null)
+                return binding.component;
         }
         return null;
     }

@@ -54,7 +54,7 @@ public class MagnetTool : BaseTool
             var enemy = hit.collider.GetComponent<BaseEnemy>();
             if (enemy != null)
             {
-                enemy.TakeDamage(damage);
+                enemy.TakeDamage(damage, _toolData);
             }
         }
 

@@ -1,10 +1,6 @@
 using UnityEngine;
 
-/// <summary>
-/// Player platformer controller with gravity-based jump physics.
-/// Variable jump height: hold jump for full height, tap for short hop.
-/// Physics derived from PlayerData (maxJumpHeight, timeToMaxHeight).
-/// </summary>
+/// Player platformer controller. Variable jump height via PlayerData.
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(BoxCollider2D))]
 [RequireComponent(typeof(Animator))]
@@ -12,6 +8,14 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Data")]
     [SerializeField] private PlayerData _data;
+
+    [Header("Identity")]
+    [Tooltip("0 = Player 1, 1 = Player 2. Set per prefab.")]
+    [SerializeField] private int _playerIndex = 0;
+    public int PlayerIndex => _playerIndex;
+
+    [Header("Input")]
+    [SerializeField] private PlayerInputHandler _inputHandler;
 
     [Header("Ground Check")]
     [SerializeField] private Transform _groundCheckPoint;
@@ -36,6 +40,7 @@ public class PlayerController : MonoBehaviour
     private bool _jumpRequested;
     private bool _jumpCut;
     private float _velocityY;
+    private float _jumpCooldownTimer;
     private int _facingDirection = 1; // 1 = right, -1 = left
     public int FacingDirection => _facingDirection;
 
@@ -52,13 +57,13 @@ public class PlayerController : MonoBehaviour
         _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         _animator = GetComponent<Animator>();
 
+        if (_inputHandler == null)
+            _inputHandler = GetComponent<PlayerInputHandler>();
+
         CacheJumpPhysics();
     }
 
-    /// <summary>
-    /// Derive gravity and initial jump velocity from designer-friendly SO values.
-    /// g = 2h / t²   |   v₀ = 2h / t
-    /// </summary>
+    // g = 2h / t²  |  v₀ = 2h / t
     private void CacheJumpPhysics()
     {
         float h = _data != null ? _data.maxJumpHeight : 3.5f;
@@ -71,16 +76,18 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        _moveInput = Input.GetAxisRaw("Horizontal");
+        if (_inputHandler == null) return;
+
+        _moveInput = _inputHandler.MoveInput;
 
         // Jump request (consumed in FixedUpdate)
-        bool jumpDown = Input.GetButtonDown("Jump") || Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow);
-        if (jumpDown && _isGrounded)
+        // JumpPressed = tap; JumpHeld = hold for bunny hop (auto-jump on landing)
+        if (_jumpCooldownTimer > 0f) _jumpCooldownTimer -= Time.deltaTime;
+        if ((_inputHandler.JumpPressed || _inputHandler.JumpHeld) && _isGrounded && _jumpCooldownTimer <= 0f)
             _jumpRequested = true;
 
-        // Variable jump: releasing the button early cuts upward velocity once
-        bool jumpUp = Input.GetButtonUp("Jump") || Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.UpArrow);
-        if (jumpUp && _velocityY > 0f && !_isGrounded)
+        // Variable jump: releasing early cuts upward velocity
+        if (_inputHandler.JumpReleased && _velocityY > 0f && !_isGrounded)
             _jumpCut = true;
 
         // Facing direction
@@ -112,6 +119,7 @@ public class PlayerController : MonoBehaviour
             _velocityY = _initialJumpVelocity;
             _jumpCut = false;
             _jumpRequested = false;
+            _jumpCooldownTimer = 0.15f;
 
             // Jump SFX
             if (_data != null && _data.jumpSFX != null && SFXManager.Instance != null)
@@ -173,9 +181,6 @@ public class PlayerController : MonoBehaviour
         _isGrounded = IsGroundHit(centerHit) || IsGroundHit(leftHit) || IsGroundHit(rightHit);
     }
 
-    /// <summary>
-    /// Get the attack direction based on facing.
-    /// </summary>
     public Vector2 GetAimDirection()
     {
         return new Vector2(_facingDirection, 0);
@@ -209,10 +214,7 @@ public class PlayerController : MonoBehaviour
         return hit.collider != null && hit.normal.y > 0.7f;
     }
 
-    /// <summary>
-    /// Check actual physics contacts (not raycasts) for ground below.
-    /// Used for velocity snapping — more accurate than raycasts for position.
-    /// </summary>
+    // Check actual physics contacts for ground below (more accurate than raycasts).
     private bool IsPhysicallyOnGround()
     {
         ContactFilter2D filter = new ContactFilter2D();
@@ -251,10 +253,6 @@ public class PlayerController : MonoBehaviour
     }
 
 #if UNITY_EDITOR
-    /// <summary>
-    /// Draw the actual BoxCollider2D bounds so you can see where it really is.
-    /// Green = collider, Yellow = sprite bounds.
-    /// </summary>
     private void OnDrawGizmos()
     {
         if (_boxCollider == null) _boxCollider = GetComponent<BoxCollider2D>();

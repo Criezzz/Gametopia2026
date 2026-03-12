@@ -16,10 +16,10 @@ MonoBehaviour:
   description: Rapid fire small nails.
   toolType: 1
   unlockScore: 10
-  baseWeight: 100
-  damage: 1
+  baseWeight: 97
+  damage: 3
   secondaryDamage: 0
-  cooldown: 0.1
+  cooldown: 0.05
   attackParam: 12
   pierce: 0
   toolIcon: {fileID: -2772392521596549887, guid: bf7ad2c691a113d41af51e8bbf576384, type: 3}
@@ -29,4 +29,9 @@ MonoBehaviour:
   weaponHoldDistance: 0.5
   weaponYOffset: 0
   behaviorConfig: {fileID: 0}
-  attackSFX: {fileID: 0}
+  attackSFX: {fileID: 8300000, guid: 3f051a33a5676b341b4864a05ab0979c, type: 3}
+  secondaryAttackSFX: {fileID: 0}
+  hitSFX: {fileID: 0}
+  hitVFXPrefab: {fileID: 0}
+  hitTextPrefab: {fileID: 0}
+  hitTextSprites: []

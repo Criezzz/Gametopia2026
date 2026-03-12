@@ -29,7 +29,7 @@ public class ScrewdriverTool : BaseTool
         {
             GameObject proj = Instantiate(prefab, origin, Quaternion.identity);
             var toolProjectile = proj.GetComponent<ToolProjectile>();
-            toolProjectile.Initialize(dir, _projectileSpeed, damage, false);
+            toolProjectile.Initialize(dir, _projectileSpeed, damage, false, _toolData);
         }
 
         StartCooldown();

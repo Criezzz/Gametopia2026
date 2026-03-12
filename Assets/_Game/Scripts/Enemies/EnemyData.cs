@@ -32,15 +32,19 @@ public class EnemyData : ScriptableObject
 
     [Header("Bottom Respawn")]
     [Tooltip("Speed multiplier when respawning from bottom (angry)")]
-    public float respawnSpeedMultiplier = 2f;
-    [Tooltip("Color tint when respawned (angry version)")]
-    public Color respawnTint = Color.red;
+    public float respawnSpeedMultiplier = 1.5f;
 
     [Header("Visuals")]
     public Sprite enemySprite;
     [Tooltip("Sprite used when enemy becomes angry (after falling off screen)")]
     public Sprite angrySprite;
     public RuntimeAnimatorController animatorController;
+
+    [Header("VFX")]
+    [Tooltip("Particle prefab spawned when this enemy first appears")]
+    public GameObject spawnVFXPrefab;
+    [Tooltip("Particle prefab spawned when this enemy dies")]
+    public GameObject deathVFXPrefab;
 
     [System.Obsolete("No longer used. Each normalAnimator.controller now contains both normal and angry states with an IsAngry bool transition.")]
     [HideInInspector]

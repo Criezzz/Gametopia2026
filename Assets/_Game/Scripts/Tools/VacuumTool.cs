@@ -165,7 +165,7 @@ public class VacuumTool : BaseTool
                     var toolProj = proj.GetComponent<ToolProjectile>();
                     if (toolProj != null)
                     {
-                        toolProj.Initialize(dir, _shootSpeed, _shootDamage, false);
+                        toolProj.Initialize(dir, _shootSpeed, _shootDamage, false, _toolData);
                         toolProj.SetRotating(true);
                     }
 
@@ -187,6 +187,9 @@ public class VacuumTool : BaseTool
                 // Camera shake per shot
                 if (CameraShake.Instance != null)
                     CameraShake.Instance.Shake(0.08f, 0.05f);
+
+                // Phase 2 SFX: once per enemy shot
+                PlaySecondaryAttackSFX();
 
                 // Destroy the sucked enemy
                 Destroy(enemyObj);

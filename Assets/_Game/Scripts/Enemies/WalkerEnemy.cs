@@ -11,6 +11,9 @@ public class WalkerEnemy : BaseEnemy
     private int _direction = 1; // 1 = right, -1 = left
     private bool _hasLanded;      // No horizontal movement until first ground contact
 
+    /// <summary>Force initial walk direction (1 = right, -1 = left).</summary>
+    public void SetDirection(int dir) => _direction = dir >= 0 ? 1 : -1;
+
     protected override void Awake()
     {
         base.Awake();

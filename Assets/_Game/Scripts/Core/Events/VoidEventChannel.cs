@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-/// <summary>
-/// ScriptableObject event channel with no payload.
-/// Uses HashSet to prevent duplicate listener registration.
-/// </summary>
-[CreateAssetMenu(menuName = "BossRush/Events/Void Event Channel")]
+/// SO event channel with no payload.
+[CreateAssetMenu(menuName = "ToolCrate/Events/Void Event Channel")]
 public class VoidEventChannel : ScriptableObject
 {
     private readonly HashSet<Action> _listeners = new();

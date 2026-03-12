@@ -107,7 +107,7 @@ public class TapeMeasureTool : BaseTool
                 var enemy = hit.collider.GetComponent<BaseEnemy>();
                 if (enemy != null)
                 {
-                    enemy.TakeDamage(damageToApply);
+                    enemy.TakeDamage(damageToApply, _toolData);
                 }
             }
         }
