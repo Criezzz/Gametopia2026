@@ -86,7 +86,7 @@ public class PauseUI : MonoBehaviour
 
         string sceneToLoad = GameManager.Instance != null 
             ? GameManager.Instance.ActiveSceneName 
-            : SceneNames.Game;
+            : SceneManager.GetActiveScene().name;
         SceneManager.LoadScene(sceneToLoad);
     }
 

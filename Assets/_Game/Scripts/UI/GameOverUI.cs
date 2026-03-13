@@ -95,7 +95,9 @@ public class GameOverUI : MonoBehaviour
         if (_newHighScoreLabel != null) _newHighScoreLabel.gameObject.SetActive(false); // Default to off
         if (_arenaScoreContainer != null) _arenaScoreContainer.SetActive(isArena);
 
-        int highScore = SaveManager.Data.highScore;
+        int highScore = GameManager.Instance != null
+            ? GameManager.Instance.GetCurrentMapHighScore()
+            : SaveManager.Data.highScore;
 
         if (isArena)
         {
@@ -181,7 +183,7 @@ public class GameOverUI : MonoBehaviour
         _isTransitioning = true;
         _isVisible = false;
 
-        Debug.Log("[GameOverUI] DoRestart — loading Game scene.");
+        Debug.Log("[GameOverUI] DoRestart — reloading gameplay scene.");
         SetPanelVisible(false);
         Time.timeScale = 1f;
 
@@ -190,7 +192,7 @@ public class GameOverUI : MonoBehaviour
 
         string sceneToLoad = GameManager.Instance != null 
             ? GameManager.Instance.ActiveSceneName 
-            : SceneNames.Game;
+            : SceneManager.GetActiveScene().name;
         SceneManager.LoadScene(sceneToLoad);
     }
 

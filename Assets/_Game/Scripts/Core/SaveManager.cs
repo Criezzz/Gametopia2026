@@ -44,11 +44,13 @@ public static class SaveManager
         {
             string json = File.ReadAllText(path);
             _data = JsonUtility.FromJson<SaveData>(json);
+            SanitizeData();
             Debug.Log($"[SaveManager] Loaded from {path} — highScore: {_data.highScore}");
         }
         else
         {
             _data = new SaveData();
+            SanitizeData();
             Debug.Log($"[SaveManager] No save file found, using defaults. Path: {path}");
         }
     }
@@ -58,9 +60,58 @@ public static class SaveManager
     /// </summary>
     public static void Save()
     {
+        if (_data == null)
+            _data = new SaveData();
+
+        SanitizeData();
+
         string json = JsonUtility.ToJson(_data, true); // prettyPrint for easy editing
         File.WriteAllText(FilePath, json);
         Debug.Log($"[SaveManager] Saved to {FilePath}");
+    }
+
+    /// <summary>
+    /// Returns high score for a specific map id. Unknown map returns 0.
+    /// </summary>
+    public static int GetMapHighScore(string mapId)
+    {
+        string key = NormalizeMapId(mapId);
+        if (string.IsNullOrEmpty(key)) return 0;
+
+        var entries = Data.mapHighScores;
+        for (int i = 0; i < entries.Count; i++)
+        {
+            MapHighScoreEntry entry = entries[i];
+            if (entry != null && string.Equals(entry.mapId, key, System.StringComparison.Ordinal))
+                return Mathf.Max(0, entry.highScore);
+        }
+
+        return 0;
+    }
+
+    /// <summary>
+    /// Sets high score for a map if the new score is higher than the existing value.
+    /// </summary>
+    public static void SetMapHighScore(string mapId, int score)
+    {
+        string key = NormalizeMapId(mapId);
+        if (string.IsNullOrEmpty(key)) return;
+
+        score = Mathf.Max(0, score);
+        var entries = Data.mapHighScores;
+
+        for (int i = 0; i < entries.Count; i++)
+        {
+            MapHighScoreEntry entry = entries[i];
+            if (entry == null) continue;
+            if (!string.Equals(entry.mapId, key, System.StringComparison.Ordinal)) continue;
+
+            if (score > entry.highScore)
+                entry.highScore = score;
+            return;
+        }
+
+        entries.Add(new MapHighScoreEntry { mapId = key, highScore = score });
     }
 
     /// <summary>
@@ -79,5 +130,25 @@ public static class SaveManager
         _data = new SaveData();
         Save();
         Debug.Log($"[SaveManager] Save data RESET. highScore: 0");
+    }
+
+    private static void SanitizeData()
+    {
+        if (_data == null)
+            _data = new SaveData();
+
+        if (_data.mapHighScores == null)
+            _data.mapHighScores = new System.Collections.Generic.List<MapHighScoreEntry>();
+
+        if (_data.highScore < 0)
+            _data.highScore = 0;
+    }
+
+    private static string NormalizeMapId(string mapId)
+    {
+        if (string.IsNullOrWhiteSpace(mapId))
+            return string.Empty;
+
+        return mapId.Trim();
     }
 }

@@ -1,4 +1,6 @@
 #if UNITY_EDITOR
+using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,17 +10,39 @@ public class SetupBuildSettings
     [MenuItem("Tools/Setup Build Settings")]
     public static void Setup()
     {
-        var scenes = new EditorBuildSettingsScene[]
+        string[] guids = AssetDatabase.FindAssets("t:Scene", new[] { "Assets/_Game/Scenes" });
+        List<string> allScenePaths = guids
+            .Select(AssetDatabase.GUIDToAssetPath)
+            .Where(path => path.EndsWith(".unity"))
+            .ToList();
+
+        // Keep core scenes first for backward compatibility; append the rest alphabetically.
+        string[] priority =
         {
-            new EditorBuildSettingsScene("Assets/_Game/Scenes/MainMenu.unity", true),
-            new EditorBuildSettingsScene("Assets/_Game/Scenes/Game.unity", true),
-            new EditorBuildSettingsScene("Assets/_Game/Scenes/MapPicker.unity", true),
-            new EditorBuildSettingsScene("Assets/_Game/Scenes/Settings.unity", true),
-            new EditorBuildSettingsScene("Assets/_Game/Scenes/Achievement.unity", true),
-            new EditorBuildSettingsScene("Assets/_Game/Scenes/Arena.unity", true),
+            "Assets/_Game/Scenes/MainMenu.unity",
+            "Assets/_Game/Scenes/Game.unity",
+            "Assets/_Game/Scenes/MapPicker.unity",
+            "Assets/_Game/Scenes/Settings.unity",
+            "Assets/_Game/Scenes/Achievement.unity",
+            "Assets/_Game/Scenes/Arena.unity",
         };
-        EditorBuildSettings.scenes = scenes;
-        Debug.Log("[SetupBuildSettings] Build settings updated: MainMenu=0, Game=1, MapPicker=2, Settings=3, Achievement=4, Arena=5.");
+
+        List<string> ordered = new();
+        foreach (string path in priority)
+        {
+            if (allScenePaths.Remove(path))
+                ordered.Add(path);
+        }
+
+        allScenePaths.Sort();
+        ordered.AddRange(allScenePaths);
+
+        EditorBuildSettings.scenes = ordered
+            .Select(path => new EditorBuildSettingsScene(path, true))
+            .ToArray();
+
+        Debug.Log($"[SetupBuildSettings] Build settings updated with {ordered.Count} scenes. " +
+                  "Core scenes are prioritized, map scenes are auto-included.");
     }
 }
 #endif

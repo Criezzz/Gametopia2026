@@ -24,10 +24,20 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int _score;
     public int Score => _score;
     public int HighScore { get; private set; }
+    public int CurrentMapHighScore => SaveManager.GetMapHighScore(GetCurrentMapScoreKey());
 
     [Header("Game Mode")]
     [SerializeField] private GameModeData _currentMode;
     public GameModeData CurrentMode => _currentMode;
+
+    private MapData _currentMap;
+    public MapData CurrentMap => _currentMap;
+
+    public void SetMap(MapData map)
+    {
+        _currentMap = map;
+        PendingMap = map;
+    }
 
     /// <summary>
     /// Temporary storage for the mode chosen in the Main Menu, 
@@ -36,9 +46,12 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public static GameModeData PendingGameMode { get; set; }
 
-    public string ActiveSceneName => (_currentMode != null && !string.IsNullOrEmpty(_currentMode.sceneName)) 
-        ? _currentMode.sceneName 
-        : SceneNames.Game;
+    /// <summary>
+    /// Temporary storage for the map chosen in Map Picker when GameManager does not exist yet.
+    /// </summary>
+    public static MapData PendingMap { get; set; }
+
+    public string ActiveSceneName => ResolveSceneName();
     // Arena: per-player scores (index 0 = P1, index 1 = P2)
     private int[] _arenaScores = new int[2];
     public int GetArenaScore(int playerIndex) => _arenaScores[Mathf.Clamp(playerIndex, 0, 1)];
@@ -86,9 +99,32 @@ public class GameManager : MonoBehaviour
         if (PendingGameMode != null && _currentMode == null)
             _currentMode = PendingGameMode;
 
+        // Apply pending map chosen before this instance existed (MapPicker → gameplay scene)
+        if (PendingMap != null && _currentMap == null)
+            _currentMap = PendingMap;
+
         // Load save data from JSON
         SaveManager.Load();
         HighScore = SaveManager.Data.highScore;
+
+        // Ensure global high score is at least the max of all per-map highscores.
+        if (SaveManager.Data.mapHighScores != null)
+        {
+            int maxMapScore = 0;
+            for (int i = 0; i < SaveManager.Data.mapHighScores.Count; i++)
+            {
+                MapHighScoreEntry entry = SaveManager.Data.mapHighScores[i];
+                if (entry != null && entry.highScore > maxMapScore)
+                    maxMapScore = entry.highScore;
+            }
+
+            if (maxMapScore > HighScore)
+            {
+                HighScore = maxMapScore;
+                SaveManager.Data.highScore = HighScore;
+                SaveManager.Save();
+            }
+        }
 
         // Migrate legacy PlayerPrefs if present
         int legacyScore = PlayerPrefs.GetInt("HighScore", 0);
@@ -121,7 +157,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         string sceneName = SceneManager.GetActiveScene().name;
-        if ((sceneName == SceneNames.Game || sceneName == SceneNames.Arena) && _currentState != GameState.Playing)
+        if (IsGameplayScene(sceneName) && _currentState != GameState.Playing)
             StartGame();
     }
 
@@ -154,6 +190,72 @@ public class GameManager : MonoBehaviour
     public void SetGameMode(GameModeData mode)
     {
         _currentMode = mode;
+        PendingGameMode = mode;
+    }
+
+    /// Resolves the gameplay scene from mode + map with safe fallbacks.
+    public string ResolveSceneName(GameModeData mode = null, MapData map = null)
+    {
+        GameModeData effectiveMode = mode ?? _currentMode ?? PendingGameMode;
+        MapData effectiveMap = map ?? _currentMap ?? PendingMap;
+
+        if (effectiveMode != null && effectiveMap != null)
+        {
+            string mapScene = effectiveMap.GetSceneForMode(effectiveMode);
+            if (!string.IsNullOrEmpty(mapScene))
+                return mapScene;
+        }
+
+        if (effectiveMode != null)
+        {
+            if (!string.IsNullOrEmpty(effectiveMode.sceneName))
+                return effectiveMode.sceneName;
+
+            return effectiveMode.modeType == GameModeType.Arena
+                ? SceneNames.Arena
+                : SceneNames.Game;
+        }
+
+        return SceneNames.Game;
+    }
+
+    private bool IsGameplayScene(string sceneName)
+    {
+        if (string.IsNullOrEmpty(sceneName)) return false;
+        if (sceneName == SceneNames.MainMenu || sceneName == SceneNames.MapPicker ||
+            sceneName == SceneNames.Settings || sceneName == "Settings" || sceneName == SceneNames.Achievement)
+            return false;
+
+        // Main path: selected map+mode resolution.
+        if (sceneName == ActiveSceneName)
+            return true;
+
+        // Backward compatibility with existing default gameplay scenes.
+        return sceneName == SceneNames.Game || sceneName == SceneNames.Arena;
+    }
+
+    public int GetCurrentMapHighScore()
+    {
+        return SaveManager.GetMapHighScore(GetCurrentMapScoreKey());
+    }
+
+    private string GetCurrentMapScoreKey()
+    {
+        if (_currentMap != null)
+            return _currentMap.GetPersistentId();
+
+        string activeScene = SceneManager.GetActiveScene().name;
+        return string.IsNullOrEmpty(activeScene) ? SceneNames.Game : activeScene;
+    }
+
+    private bool TryUpdateCurrentMapHighScore()
+    {
+        int currentMapBest = GetCurrentMapHighScore();
+        if (_score <= currentMapBest)
+            return false;
+
+        SaveManager.SetMapHighScore(GetCurrentMapScoreKey(), _score);
+        return true;
     }
 
     public void StartGame()
@@ -245,14 +347,20 @@ public class GameManager : MonoBehaviour
         if (isArena)
             _arenaScores[Mathf.Clamp(playerIndex, 0, 1)]++;
 
+        bool mapHighScoreImproved = TryUpdateCurrentMapHighScore();
+        bool globalHighScoreImproved = false;
+
         if (_score > HighScore)
         {
             HighScore = _score;
             SaveManager.Data.highScore = HighScore;
-            SaveManager.Save();
+            globalHighScoreImproved = true;
 
             UpdateUnlockedTools(true);
         }
+
+        if (mapHighScoreImproved || globalHighScoreImproved)
+            SaveManager.Save();
 
         _onScoreChanged?.Raise(isArena ? _arenaScores[playerIndex] : _score);
     }
@@ -282,13 +390,19 @@ public class GameManager : MonoBehaviour
         SetState(GameState.GameOver);
         Time.timeScale = 0f;
 
+        bool mapHighScoreImproved = TryUpdateCurrentMapHighScore();
+        bool globalHighScoreImproved = false;
+
         // Update high score
         if (_score > HighScore)
         {
             HighScore = _score;
             SaveManager.Data.highScore = HighScore;
-            SaveManager.Save();
+            globalHighScoreImproved = true;
         }
+
+        if (mapHighScoreImproved || globalHighScoreImproved)
+            SaveManager.Save();
 
         _onGameOver?.Raise();
     }
@@ -315,15 +429,14 @@ public class GameManager : MonoBehaviour
 
     private void HandleGameRestart()
     {
-        // GameOverUI already calls SceneManager.LoadScene("Game") directly.
-        // This handler is for any additional cleanup GameManager needs to do before reload.
+        // UI handles actual scene load. This handler performs cleanup before reload.
         Time.timeScale = 1f;
         SetState(GameState.MainMenu); // Reset state so OnSceneLoaded → StartGame() fires
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if ((scene.name == SceneNames.Game || scene.name == SceneNames.Arena) && _currentState != GameState.Playing)
+        if (IsGameplayScene(scene.name) && _currentState != GameState.Playing)
             StartGame();
         else if (scene.name == SceneNames.MainMenu)
             SetState(GameState.MainMenu);

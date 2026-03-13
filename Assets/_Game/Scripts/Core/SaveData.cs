@@ -1,9 +1,19 @@
+using System.Collections.Generic;
+
 /// Serializable data container for player save.
 /// New fields are default-initialized automatically by JsonUtility for older saves.
+[System.Serializable]
+public class MapHighScoreEntry
+{
+    public string mapId;
+    public int highScore;
+}
+
 [System.Serializable]
 public class SaveData
 {
     public int highScore = 0;
+    public List<MapHighScoreEntry> mapHighScores = new();
 
     // Lifetime stats (tracked across all runs)
     public int totalToolPickups = 0;

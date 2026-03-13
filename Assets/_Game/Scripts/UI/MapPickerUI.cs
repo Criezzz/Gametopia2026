@@ -14,6 +14,7 @@ public class MapPickerUI : MonoBehaviour
     [SerializeField] private Image _mapPreviewImage;
     [SerializeField] private CanvasGroup _previewCanvasGroup;
     [SerializeField] private TextMeshProUGUI _mapNameText;
+    [SerializeField] private TextMeshProUGUI _mapHighScoreText;
     [SerializeField] private GameObject _lockedOverlay;
 
     [Header("Buttons")]
@@ -103,6 +104,10 @@ public class MapPickerUI : MonoBehaviour
         if (_mapNameText != null)
             _mapNameText.text = map.mapName;
 
+        int mapHighScore = SaveManager.GetMapHighScore(map.GetPersistentId());
+        if (_mapHighScoreText != null)
+            _mapHighScoreText.text = mapHighScore > 0 ? $"BEST: {mapHighScore}" : "BEST: --";
+
         if (_lockedOverlay != null)
             _lockedOverlay.SetActive(isLocked);
 
@@ -118,14 +123,21 @@ public class MapPickerUI : MonoBehaviour
         bool isLocked = !map.IsUnlocked(SaveManager.Data.highScore);
         if (isLocked) return;
 
-        if (GameManager.PendingGameMode != null)
+        GameModeData mode = GameManager.PendingGameMode;
+        if (mode != null)
         {
-            if (GameManager.Instance != null)
-                GameManager.Instance.SetGameMode(GameManager.PendingGameMode);
+            // Persist selected map even if GameManager instance does not exist yet.
+            GameManager.PendingMap = map;
 
-            string scene = !string.IsNullOrEmpty(map.sceneOverride)
-                ? map.sceneOverride
-                : GameManager.PendingGameMode.sceneName;
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.SetGameMode(mode);
+                GameManager.Instance.SetMap(map);
+            }
+
+            string scene = GameManager.Instance != null
+                ? GameManager.Instance.ResolveSceneName(mode, map)
+                : map.GetSceneForMode(mode);
 
             if (string.IsNullOrEmpty(scene))
                 scene = SceneNames.Game;

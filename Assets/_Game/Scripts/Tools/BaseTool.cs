@@ -55,6 +55,7 @@ public abstract class BaseTool : MonoBehaviour
     public virtual void OnUnequip()
     {
         StopAttack();
+        SFXManager.Instance?.StopAll();
         OnRequestSecondaryAnimation = null;
         OnRequestPrimaryAnimation = null;
         OnRequestStartHold = null;

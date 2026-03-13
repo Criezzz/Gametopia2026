@@ -1,9 +1,14 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Spawns enemies on independent per-type timers driven by EnemyData SOs.
-/// Also triggers horde events (bursts of enemies) on a separate timer.
+/// Spawns enemies using a single global timer. Each lane/horde has its own
+/// availability cooldown; when the global timer fires it picks from whatever
+/// is available following these rules:
+///   - If horde is available: spawn horde + at most 1 other lane.
+///   - Otherwise: spawn up to 3 available lanes.
+/// The global interval decreases over time for incremental pacing.
 /// Handles angry respawns when enemies fall off the bottom of the screen.
 /// </summary>
 public class EnemySpawner : MonoBehaviour
@@ -14,6 +19,18 @@ public class EnemySpawner : MonoBehaviour
 
     [Header("Horde")]
     [SerializeField] private HordeConfig _hordeConfig;
+
+    [Header("Global Spawn Timer")]
+    [Tooltip("Initial delay before the first global spawn event")]
+    [SerializeField] private float _globalFirstDelay = 2f;
+    [Tooltip("Starting interval between global spawn events (seconds)")]
+    [SerializeField] private float _globalSpawnInterval = 3f;
+    [Tooltip("Every this many seconds the global interval decreases")]
+    [SerializeField] private float _globalDifficultyTickInterval = 15f;
+    [Tooltip("How much to reduce global interval each difficulty tick")]
+    [SerializeField] private float _globalIntervalReduction = 0.2f;
+    [Tooltip("Minimum global spawn interval — will never go below this")]
+    [SerializeField] private float _globalMinInterval = 1f;
 
     [Header("Spawn Area")]
     [SerializeField] private float _spawnYOffset = 1f;
@@ -29,20 +46,21 @@ public class EnemySpawner : MonoBehaviour
     [Header("Event Channels")]
     [SerializeField] private EnemyFallChannel _onEnemyFell;
 
-    // Runtime state per lane (not serialized)
-    private float[] _spawnTimers;
-    private float[] _currentIntervals;
-    private float[] _difficultyTimers;
+    // Global spawn timer runtime
+    private float _globalTimer;
+    private float _globalCurrentInterval;
+    private float _globalDifficultyTimer;
 
-    // Horde runtime state
-    private float _hordeSpawnTimer;
-    private float _hordeCurrentInterval;
-    private float _hordeDifficultyTimer;
+    // Per-lane availability cooldown (counts down; <= 0 means available)
+    private float[] _laneCooldowns;
+
+    // Horde availability cooldown
+    private float _hordeCooldown;
 
     private void Start()
     {
         InitLanes();
-        InitHorde();
+        InitGlobalTimer();
     }
 
     private void OnEnable()
@@ -59,106 +77,148 @@ public class EnemySpawner : MonoBehaviour
 
     private void Update()
     {
-        UpdateLanes();
-        UpdateHorde();
+        UpdateCooldowns();
+        UpdateGlobalTimer();
     }
 
-    #region Lane System
+    #region Initialization
 
     private void InitLanes()
     {
         if (_lanes == null) return;
 
-        _spawnTimers = new float[_lanes.Length];
-        _currentIntervals = new float[_lanes.Length];
-        _difficultyTimers = new float[_lanes.Length];
-
+        _laneCooldowns = new float[_lanes.Length];
         for (int i = 0; i < _lanes.Length; i++)
         {
             var data = _lanes[i].enemyData;
             if (data == null) continue;
-
-            // First spawn uses firstSpawnDelay; after that uses interval
-            _spawnTimers[i] = data.firstSpawnDelay;
-            _currentIntervals[i] = data.spawnInterval;
-            _difficultyTimers[i] = data.difficultyTickInterval;
+            _laneCooldowns[i] = data.firstSpawnDelay;
         }
+
+        // Horde cooldown
+        _hordeCooldown = _hordeConfig != null ? _hordeConfig.firstHordeDelay : float.MaxValue;
     }
 
-    private void UpdateLanes()
+    private void InitGlobalTimer()
     {
-        if (_lanes == null) return;
+        _globalTimer = _globalFirstDelay;
+        _globalCurrentInterval = _globalSpawnInterval;
+        _globalDifficultyTimer = _globalDifficultyTickInterval;
+    }
 
-        for (int i = 0; i < _lanes.Length; i++)
+    #endregion
+
+    #region Update Loop
+
+    private void UpdateCooldowns()
+    {
+        // Tick lane cooldowns
+        if (_laneCooldowns != null)
         {
-            var lane = _lanes[i];
-            if (lane.prefab == null || lane.enemyData == null) continue;
-
-            var data = lane.enemyData;
-
-            // Difficulty scaling per lane
-            _difficultyTimers[i] -= Time.deltaTime;
-            if (_difficultyTimers[i] <= 0f)
+            for (int i = 0; i < _laneCooldowns.Length; i++)
             {
-                _difficultyTimers[i] = data.difficultyTickInterval;
-                _currentIntervals[i] = Mathf.Max(
-                    data.minSpawnInterval,
-                    _currentIntervals[i] - data.intervalReductionPerTick
-                );
+                if (_laneCooldowns[i] > 0f)
+                    _laneCooldowns[i] -= Time.deltaTime;
             }
+        }
 
-            // Spawn timer per lane
-            _spawnTimers[i] -= Time.deltaTime;
-            if (_spawnTimers[i] <= 0f)
-            {
-                SpawnEnemy(lane.prefab, lane.enemyData);
-                _spawnTimers[i] = _currentIntervals[i];
-            }
+        // Tick horde cooldown
+        if (_hordeCooldown > 0f)
+            _hordeCooldown -= Time.deltaTime;
+    }
+
+    private void UpdateGlobalTimer()
+    {
+        // Global difficulty scaling
+        _globalDifficultyTimer -= Time.deltaTime;
+        if (_globalDifficultyTimer <= 0f)
+        {
+            _globalDifficultyTimer = _globalDifficultyTickInterval;
+            _globalCurrentInterval = Mathf.Max(
+                _globalMinInterval,
+                _globalCurrentInterval - _globalIntervalReduction
+            );
+        }
+
+        // Global spawn event
+        _globalTimer -= Time.deltaTime;
+        if (_globalTimer <= 0f)
+        {
+            DoSpawnEvent();
+            _globalTimer = _globalCurrentInterval;
         }
     }
 
     #endregion
 
-    #region Horde System
+    #region Spawn Event
 
-    private void InitHorde()
+    private void DoSpawnEvent()
     {
-        if (_hordeConfig == null) return;
+        bool hordeAvailable = _hordeConfig != null
+            && _hordeConfig.enemyPrefab != null
+            && _hordeCooldown <= 0f;
 
-        _hordeSpawnTimer = _hordeConfig.firstHordeDelay;
-        _hordeCurrentInterval = _hordeConfig.hordeInterval;
-        _hordeDifficultyTimer = _hordeConfig.difficultyTickInterval;
-    }
-
-    private void UpdateHorde()
-    {
-        if (_hordeConfig == null || _hordeConfig.enemyPrefab == null) return;
-
-        // Difficulty scaling for horde
-        _hordeDifficultyTimer -= Time.deltaTime;
-        if (_hordeDifficultyTimer <= 0f)
+        // Gather available lane indices
+        List<int> availableLanes = new();
+        if (_lanes != null && _laneCooldowns != null)
         {
-            _hordeDifficultyTimer = _hordeConfig.difficultyTickInterval;
-            _hordeCurrentInterval = Mathf.Max(
-                _hordeConfig.minHordeInterval,
-                _hordeCurrentInterval - _hordeConfig.intervalReductionPerTick
-            );
+            for (int i = 0; i < _lanes.Length; i++)
+            {
+                if (_lanes[i].prefab == null || _lanes[i].enemyData == null) continue;
+                if (_laneCooldowns[i] <= 0f)
+                    availableLanes.Add(i);
+            }
         }
 
-        // Horde timer
-        _hordeSpawnTimer -= Time.deltaTime;
-        if (_hordeSpawnTimer <= 0f)
+        if (!hordeAvailable && availableLanes.Count == 0) return;
+
+        // Shuffle available lanes for random selection
+        ShuffleList(availableLanes);
+
+        if (hordeAvailable)
         {
+            // Spawn horde + at most 1 other lane
             StartCoroutine(SpawnHordeRoutine());
-            _hordeSpawnTimer = _hordeCurrentInterval;
+            _hordeCooldown = _hordeConfig.hordeInterval;
+
+            if (availableLanes.Count > 0)
+            {
+                int idx = availableLanes[0];
+                SpawnEnemy(_lanes[idx].prefab, _lanes[idx].enemyData);
+                _laneCooldowns[idx] = _lanes[idx].enemyData.spawnInterval;
+            }
+        }
+        else
+        {
+            // Spawn up to 3 available lanes
+            int count = Mathf.Min(3, availableLanes.Count);
+            for (int i = 0; i < count; i++)
+            {
+                int idx = availableLanes[i];
+                SpawnEnemy(_lanes[idx].prefab, _lanes[idx].enemyData);
+                _laneCooldowns[idx] = _lanes[idx].enemyData.spawnInterval;
+            }
         }
     }
+
+    private static void ShuffleList(List<int> list)
+    {
+        for (int i = list.Count - 1; i > 0; i--)
+        {
+            int j = Random.Range(0, i + 1);
+            (list[i], list[j]) = (list[j], list[i]);
+        }
+    }
+
+    #endregion
+
+    #region Horde
 
     private IEnumerator SpawnHordeRoutine()
     {
         if (_hordeConfig.enemyPrefab == null || Camera.main == null) yield break;
 
-        // All horde enemies share the same spawn position and direction
         float x = Random.value < 0.5f ? _spawnXLeft : _spawnXRight;
         float y = Camera.main.transform.position.y + Camera.main.orthographicSize + _spawnYOffset;
         Vector2 spawnPos = new Vector2(x, y);
@@ -168,7 +228,6 @@ public class EnemySpawner : MonoBehaviour
         {
             GameObject enemy = Instantiate(_hordeConfig.enemyPrefab, spawnPos, Quaternion.identity);
 
-            // Force same walk direction so they form a chain
             WalkerEnemy walker = enemy.GetComponent<WalkerEnemy>();
             if (walker != null) walker.SetDirection(sharedDirection);
 
@@ -198,10 +257,6 @@ public class EnemySpawner : MonoBehaviour
 
     #region Angry Respawn
 
-    /// <summary>
-    /// Called when an enemy falls off the screen via the EnemyFallChannel.
-    /// Respawns the enemy at the top of the screen as angry.
-    /// </summary>
     private void HandleEnemyFell(EnemyFallData data)
     {
         if (data.enemyData == null || Camera.main == null) return;
@@ -232,7 +287,6 @@ public class EnemySpawner : MonoBehaviour
 
     private GameObject GetPrefabForMoveType(EnemyMoveType moveType)
     {
-        // Search lanes for the matching move type
         if (_lanes != null)
         {
             foreach (var lane in _lanes)
@@ -242,7 +296,6 @@ public class EnemySpawner : MonoBehaviour
             }
         }
 
-        // Fallback: return first lane prefab if available
         if (_lanes != null && _lanes.Length > 0 && _lanes[0].prefab != null)
             return _lanes[0].prefab;
 
@@ -251,10 +304,6 @@ public class EnemySpawner : MonoBehaviour
 
     #endregion
 
-    /// <summary>
-    /// A spawn lane pairs a prefab with its EnemyData SO.
-    /// Each lane runs its own independent timer.
-    /// </summary>
     [System.Serializable]
     public class SpawnLane
     {

@@ -61,4 +61,13 @@ public class SFXManager : MonoBehaviour
         if (clip == null || _audioSource == null) return;
         _audioSource.PlayOneShot(clip, volume);
     }
+
+    /// <summary>
+    /// Stop all currently playing SFX immediately (e.g. on tool switch).
+    /// </summary>
+    public void StopAll()
+    {
+        if (_audioSource == null) return;
+        _audioSource.Stop();
+    }
 }
