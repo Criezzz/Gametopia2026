@@ -32,7 +32,11 @@ public class EnemySpawner : MonoBehaviour
     [Tooltip("Minimum global spawn interval — will never go below this")]
     [SerializeField] private float _globalMinInterval = 1f;
 
-    [Header("Spawn Area")]
+    [Header("Map Spawn Config")]
+    [Tooltip("Direct scene-level override. If set, takes priority over GameManager.CurrentMap.spawnConfig.")]
+    [SerializeField] private MapSpawnConfig _mapSpawnConfig;
+
+    [Header("Spawn Area (fallback defaults if no MapSpawnConfig is resolved)")]
     [SerializeField] private float _spawnYOffset = 1f;
     [SerializeField] private float _spawnXLeft = -4f;
     [SerializeField] private float _spawnXRight = 4f;
@@ -42,6 +46,9 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private float _angryDropShakeDuration = 0.15f;
     [Tooltip("Shake magnitude when an angry enemy drops from the sky")]
     [SerializeField] private float _angryDropShakeMagnitude = 0.1f;
+
+    public float AngryDropShakeDuration => _angryDropShakeDuration;
+    public float AngryDropShakeMagnitude => _angryDropShakeMagnitude;
 
     [Header("Event Channels")]
     [SerializeField] private EnemyFallChannel _onEnemyFell;
@@ -59,6 +66,7 @@ public class EnemySpawner : MonoBehaviour
 
     private void Start()
     {
+        ApplyMapSpawnConfig();
         InitLanes();
         InitGlobalTimer();
     }
@@ -82,6 +90,20 @@ public class EnemySpawner : MonoBehaviour
     }
 
     #region Initialization
+
+    private void ApplyMapSpawnConfig()
+    {
+        MapSpawnConfig config = _mapSpawnConfig;
+
+        if (config == null && GameManager.Instance != null)
+            config = GameManager.Instance.CurrentMap?.spawnConfig;
+
+        if (config == null) return;
+
+        _spawnXLeft = config.spawnXLeft;
+        _spawnXRight = config.spawnXRight;
+        _spawnYOffset = config.spawnYOffset;
+    }
 
     private void InitLanes()
     {

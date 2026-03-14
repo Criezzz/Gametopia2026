@@ -9,4 +9,5 @@ public static class SceneNames
     public const string Settings = "Setting";
     public const string Achievement = "Achievement";
     public const string Arena = "Arena";
+    public const string Tutorial = "Tutorial";
 }

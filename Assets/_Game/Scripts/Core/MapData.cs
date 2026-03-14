@@ -15,6 +15,12 @@ public class MapData : ScriptableObject
     [Header("Unlocks")]
     [Tooltip("The High Score required to permanently unlock this map. 0 means always unlocked.")]
     public int unlockScore = 0;
+    [Tooltip("Total enemies killed required to unlock. Takes priority over unlockScore when > 0.")]
+    public int unlockKills = 0;
+
+    [Header("Spawn Configuration")]
+    [Tooltip("Per-map spawn positions for enemies and toolbox. Leave null to use spawner defaults.")]
+    public MapSpawnConfig spawnConfig;
 
     [Header("Scene Routing")]
     [Tooltip("Solo scene override. Leave empty to use GameModeData.sceneName (default: Game).")]
@@ -39,12 +45,27 @@ public class MapData : ScriptableObject
         return mode.sceneName;
     }
 
-    /// <summary>
-    /// Checks if the map is available for the given high score.
-    /// </summary>
+    /// Checks if the map is unlocked given saved progress.
+    public bool IsUnlocked(SaveData data)
+    {
+        if (data == null) return unlockScore <= 0 && unlockKills <= 0;
+        if (unlockKills > 0) return data.totalEnemiesKilled >= unlockKills;
+        return data.highScore >= unlockScore;
+    }
+
+    /// Backwards-compatible overload for callers that only have high score.
     public bool IsUnlocked(int currentHighScore)
     {
+        if (unlockKills > 0) return SaveManager.Data.totalEnemiesKilled >= unlockKills;
         return currentHighScore >= unlockScore;
+    }
+
+    /// Human-readable description of the unlock condition.
+    public string GetUnlockDescription()
+    {
+        if (unlockKills > 0) return $"Kill {unlockKills} enemies";
+        if (unlockScore > 0) return $"Score {unlockScore}";
+        return "Always unlocked";
     }
 
     /// <summary>

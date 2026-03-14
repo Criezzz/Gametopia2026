@@ -9,6 +9,7 @@ public class MainMenuUI : MonoBehaviour
     [Header("UI Elements")]
     [SerializeField] private Button _soloButton;
     [SerializeField] private Button _arenaButton;
+    [SerializeField] private Button _tutorialButton;
     [SerializeField] private Button _settingsButton;
     [SerializeField] private Button _achievementButton;
     [SerializeField] private Button _quitButton;
@@ -26,6 +27,7 @@ public class MainMenuUI : MonoBehaviour
     {
         if (_soloButton != null) { _soloButton.onClick.RemoveAllListeners(); _soloButton.onClick.AddListener(OnSoloClicked); }
         if (_arenaButton != null) { _arenaButton.onClick.RemoveAllListeners(); _arenaButton.onClick.AddListener(OnArenaClicked); }
+        if (_tutorialButton != null) { _tutorialButton.onClick.RemoveAllListeners(); _tutorialButton.onClick.AddListener(OnTutorialClicked); }
         if (_settingsButton != null) { _settingsButton.onClick.RemoveAllListeners(); _settingsButton.onClick.AddListener(OnSettingsClicked); }
         if (_achievementButton != null) { _achievementButton.onClick.RemoveAllListeners(); _achievementButton.onClick.AddListener(OnAchievementClicked); }
         if (_quitButton != null) { _quitButton.onClick.RemoveAllListeners(); _quitButton.onClick.AddListener(OnQuitClicked); }
@@ -58,14 +60,23 @@ public class MainMenuUI : MonoBehaviour
         Debug.Log("Arena clicked");
     }
 
+    public void OnTutorialClicked()
+    {
+        GameManager.IsTutorial = true;
+        LoadScene(SceneNames.Tutorial);
+        Debug.Log("Tutorial clicked");
+    }
+
     public void OnSettingsClicked()
     {
-        LoadScene(SceneNames.Settings);
+        if (MenuSlideController.Instance != null)
+            MenuSlideController.Instance.ShowSettings();
     }
 
     public void OnAchievementClicked()
     {
-        LoadScene(SceneNames.Achievement);
+        if (MenuSlideController.Instance != null)
+            MenuSlideController.Instance.ShowAchievement();
     }
 
     public void OnQuitClicked()

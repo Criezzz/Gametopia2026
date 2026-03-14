@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MapData
   mapName: Map 1
   mapId: map_01
-  previewSprite: {fileID: 0}
+  previewSprite: {fileID: -5623194428626525839, guid: ab359027a31b8fd4699f60fe1c679d3b, type: 3}
   unlockScore: 0
+  spawnConfig: {fileID: 11400000, guid: 2994ca850f815424eacc1ffe858a4fb2, type: 2}
   soloSceneOverride: 
   arenaSceneOverride: 
   sceneOverride: Game

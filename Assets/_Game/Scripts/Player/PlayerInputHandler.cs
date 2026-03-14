@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Utilities;
 
 /// Reads input directly from an InputActionAsset filtered by control scheme.
 /// Does NOT use PlayerInput component — avoids device auto-pairing conflicts in local multiplayer.
@@ -137,5 +138,38 @@ public class PlayerInputHandler : MonoBehaviour
     public string SaveBindingOverrides()
     {
         return _inputActions.SaveBindingOverridesAsJson();
+    }
+
+    /// Returns a human-readable display name for a bound key.
+    /// For composite actions (e.g. Move), pass the part name ("left", "right", "up", "down").
+    public string GetKeyDisplayName(string actionName, string compositePart = null)
+    {
+        InputAction action = _playerMap?.FindAction(actionName);
+        if (action == null) return "?";
+
+        ReadOnlyArray<InputBinding> bindings = action.bindings;
+        for (int i = 0; i < bindings.Count; i++)
+        {
+            var binding = bindings[i];
+            if (binding.isComposite) continue;
+            if (string.IsNullOrEmpty(binding.effectivePath)) continue;
+
+            if (!string.IsNullOrEmpty(compositePart))
+            {
+                if (!binding.isPartOfComposite ||
+                    !string.Equals(binding.name, compositePart, System.StringComparison.OrdinalIgnoreCase))
+                    continue;
+            }
+            else if (binding.isPartOfComposite)
+            {
+                continue;
+            }
+
+            return InputControlPath.ToHumanReadableString(
+                binding.effectivePath,
+                InputControlPath.HumanReadableStringOptions.OmitDevice);
+        }
+
+        return "?";
     }
 }

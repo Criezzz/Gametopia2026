@@ -260,6 +260,12 @@ MonoBehaviour:
   - prefab: {fileID: 3910564067927016839, guid: 07bb442427e706b4dac81d6160ba4239, type: 3}
     enemyData: {fileID: 11400000, guid: 3cb3b08b549546c408c580f5af25573a, type: 2}
   _hordeConfig: {fileID: 11400000, guid: a3936558418fae449bbef98a45e9c9e0, type: 2}
+  _globalFirstDelay: 2
+  _globalSpawnInterval: 3
+  _globalDifficultyTickInterval: 15
+  _globalIntervalReduction: 0.2
+  _globalMinInterval: 1
+  _mapSpawnConfig: {fileID: 0}
   _spawnYOffset: 1
   _spawnXLeft: -5
   _spawnXRight: 5
@@ -315,7 +321,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -20.28}
+  m_AnchoredPosition: {x: 0, y: -20.28003}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &175592128
@@ -4925,7 +4931,9 @@ PrefabInstance:
       value: Player
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 7809960405662215176, guid: e93221ecf18706c4996371c5c5ae929f, type: 3}
+    - {fileID: 2895717603319297388, guid: e93221ecf18706c4996371c5c5ae929f, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e93221ecf18706c4996371c5c5ae929f, type: 3}

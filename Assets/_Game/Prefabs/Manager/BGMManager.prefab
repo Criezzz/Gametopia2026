@@ -145,11 +145,7 @@ MonoBehaviour:
   _bgmMixerGroup: {fileID: 6800421523809356743, guid: 0ec525a2b606e0644835829253fab73a, type: 2}
   _sceneTracks:
   - sceneName: MainMenu
-    clip: {fileID: 0}
-  - sceneName: Achievement
-    clip: {fileID: 0}
-  - sceneName: Setting
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 6c1c74eb3172da84994162ecbc615dbd, type: 3}
   - sceneName: MapPicker
-    clip: {fileID: 0}
-  _crossfadeDuration: 0.4
+    clip: {fileID: 8300000, guid: 6c1c74eb3172da84994162ecbc615dbd, type: 3}
+  _crossfadeDuration: 0.2

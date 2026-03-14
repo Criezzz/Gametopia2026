@@ -126,7 +126,8 @@ public class GameOverUI : MonoBehaviour
                 _highScoreText.text = $"BEST: {highScore}";
 
             if (_newHighScoreLabel != null)
-                _newHighScoreLabel.gameObject.SetActive(_latestScore >= highScore && _latestScore > 0);
+                _newHighScoreLabel.gameObject.SetActive(
+                    !GameManager.IsTutorial && _latestScore >= highScore && _latestScore > 0);
         }
 
         // Force EventSystem to recognize the restart button (secondary mechanism)

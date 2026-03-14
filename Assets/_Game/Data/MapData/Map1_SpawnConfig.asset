@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd2e3e743de79524c94862fc66634734, type: 3}
+  m_Name: Map1_SpawnConfig
+  m_EditorClassIdentifier: Assembly-CSharp::MapSpawnConfig
+  spawnXLeft: -4
+  spawnXRight: 4
+  spawnYOffset: 2
+  toolboxZones:
+  - xMin: 6.823
+    xMax: 8.495
+    y: 0.124
+  - xMin: -8.495
+    xMax: -6.823
+    y: 0.124
+  - xMin: -8.507
+    xMax: -2.023
+    y: -3.496
+  - xMin: 2.023
+    xMax: 8.507
+    y: -3.496
+  - xMin: -2
+    xMax: 2
+    y: 0.124
+  - xMin: 3.181
+    xMax: 5.502
+    y: 3.363
+  - xMin: -5.502
+    xMax: -3.181
+    y: 3.363

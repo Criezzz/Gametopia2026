@@ -15,7 +15,9 @@ MonoBehaviour:
   mapName: Map 2
   mapId: map_02
   previewSprite: {fileID: -166703347675633482, guid: 3c318237df92fc749a978c2d59f7d309, type: 3}
-  unlockScore: 10
+  unlockScore: 0
+  unlockKills: 100
+  spawnConfig: {fileID: 11400000, guid: 249c1375764578246bab282518185fa9, type: 2}
   soloSceneOverride: Game_Map2
   arenaSceneOverride: Arena_Map2
   sceneOverride: 

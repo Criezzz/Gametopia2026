@@ -96,7 +96,7 @@ public class MapPickerUI : MonoBehaviour
         if (_maps == null || _maps.Length == 0) return;
 
         MapData map = _maps[index];
-        bool isLocked = !map.IsUnlocked(SaveManager.Data.highScore);
+        bool isLocked = !map.IsUnlocked(SaveManager.Data);
 
         if (_mapPreviewImage != null && map.previewSprite != null)
             _mapPreviewImage.sprite = map.previewSprite;
@@ -120,7 +120,7 @@ public class MapPickerUI : MonoBehaviour
         if (_maps == null || _maps.Length == 0) return;
 
         MapData map = _maps[_currentIndex];
-        bool isLocked = !map.IsUnlocked(SaveManager.Data.highScore);
+        bool isLocked = !map.IsUnlocked(SaveManager.Data);
         if (isLocked) return;
 
         GameModeData mode = GameManager.PendingGameMode;

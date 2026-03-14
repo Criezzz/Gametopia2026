@@ -330,6 +330,7 @@ MonoBehaviour:
   _globalDifficultyTickInterval: 15
   _globalIntervalReduction: 0.2
   _globalMinInterval: 1
+  _mapSpawnConfig: {fileID: 0}
   _spawnYOffset: 1
   _spawnXLeft: -5
   _spawnXRight: 5
@@ -4664,11 +4665,11 @@ PrefabInstance:
       objectReference: {fileID: -944628639613478452, guid: 651bcb522e5b85d49861e8ee7f459a6a, type: 3}
     - target: {fileID: 1172746956711957778, guid: e93221ecf18706c4996371c5c5ae929f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.05
+      value: 0.03
       objectReference: {fileID: 0}
     - target: {fileID: 1172746956711957778, guid: e93221ecf18706c4996371c5c5ae929f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -3.51
+      value: -2.32
       objectReference: {fileID: 0}
     - target: {fileID: 1172746956711957778, guid: e93221ecf18706c4996371c5c5ae929f, type: 3}
       propertyPath: m_LocalPosition.z

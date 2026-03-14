@@ -260,7 +260,9 @@ public class SettingsUI : MonoBehaviour
 
     private void OnBackClicked()
     {
-        if (_onLoadScene != null && _onLoadScene.HasListeners)
+        if (MenuSlideController.Instance != null)
+            MenuSlideController.Instance.ShowMainMenu();
+        else if (_onLoadScene != null && _onLoadScene.HasListeners)
             _onLoadScene.Raise(SceneNames.MainMenu);
         else
             SceneManager.LoadScene(SceneNames.MainMenu);

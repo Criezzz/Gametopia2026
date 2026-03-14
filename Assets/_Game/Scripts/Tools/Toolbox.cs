@@ -11,7 +11,7 @@ public class Toolbox : MonoBehaviour
     [Tooltip("Particle prefab spawned when the toolbox appears at a new position")]
     [SerializeField] private GameObject _spawnVFXPrefab;
 
-    [Header("Spawn Zones")]
+    [Header("Spawn Zones (defaults — overridden by MapSpawnConfig if available)")]
     [Tooltip("Platform zones for respawning. X picked randomly within range, Y is fixed.")]
     [SerializeField] private SpawnZone[] _spawnZones = new SpawnZone[]
     {
@@ -35,7 +35,27 @@ public class Toolbox : MonoBehaviour
 
     private void Start()
     {
+        ApplyMapSpawnConfig();
         Respawn();
+    }
+
+    private void ApplyMapSpawnConfig()
+    {
+        MapSpawnConfig config = GameManager.Instance != null
+            ? GameManager.Instance.CurrentMap?.spawnConfig
+            : null;
+
+        if (config == null || config.toolboxZones == null || config.toolboxZones.Length == 0)
+            return;
+
+        _spawnZones = new SpawnZone[config.toolboxZones.Length];
+        for (int i = 0; i < config.toolboxZones.Length; i++)
+        {
+            var src = config.toolboxZones[i];
+            _spawnZones[i] = new SpawnZone(src.xMin, src.xMax, src.y);
+        }
+
+        _lastZoneIndex = -1;
     }
 
     private void OnTriggerEnter2D(Collider2D other)

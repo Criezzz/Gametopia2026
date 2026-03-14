@@ -48,7 +48,7 @@ MonoBehaviour:
   _currentState: 0
   _score: 0
   _currentMode: {fileID: 0}
-  _devMode: 1
+  _devMode: 0
   _allTools:
   - {fileID: 11400000, guid: 1c0edc7832267034a929be0875b14e0a, type: 2}
   - {fileID: 11400000, guid: e12009451a12b5148b40c20247bdcb0a, type: 2}

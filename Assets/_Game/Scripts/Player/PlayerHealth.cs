@@ -7,7 +7,7 @@ public class PlayerHealth : MonoBehaviour
     [SerializeField] private VoidEventChannel _onPlayerDied;
     [SerializeField] private float _pitDeathOffset = 0.5f;
     [SerializeField] private float _spawnGraceDuration = 0.5f;
-
+    [SerializeField] private bool _trailer = false;
     private bool _isDead;
     private float _graceTimer;
     private Camera _mainCamera;
@@ -35,6 +35,7 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
+        if(_trailer) return;
         if (_isDead || _graceTimer > 0f) return;
 
         Die();
@@ -42,6 +43,7 @@ public class PlayerHealth : MonoBehaviour
 
     private void Die()
     {
+        
         _isDead = true;
         Debug.Log("[PlayerHealth] Player died in 1 hit!");
 
