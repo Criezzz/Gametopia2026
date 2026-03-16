@@ -32,7 +32,8 @@ MonoBehaviour:
   attackSFX: {fileID: 8300000, guid: 7803b04492be0474cb2b4d37e96199fb, type: 3}
   secondaryAttackSFX: {fileID: 0}
   hitSFX: {fileID: 0}
-  hitVFXPrefab: {fileID: 0}
+  hitVFXPrefab: {fileID: 753071893409513706, guid: 3497349c36df9694bac0b939dd175340, type: 3}
+  hitVFXMinInterval: 0.06
   hitTextPrefab: {fileID: 429878832413004069, guid: 1c495891e77ceb3449731dbe9cae7539, type: 3}
   hitTextSprites:
   - {fileID: 21300000, guid: 20b4a86a80720a143a2d71dd59aa53d3, type: 3}

@@ -445,10 +445,11 @@ MonoBehaviour:
   _data: {fileID: 11400000, guid: 931307430a5f7584086e72da9d19deef, type: 2}
   _playerIndex: 0
   _inputHandler: {fileID: 0}
+  _jumpVFXPrefab: {fileID: 2454950758591499117, guid: 677aefe6096195847952b818bdf640c6, type: 3}
   _groundCheckPoint: {fileID: 1225250902755160173}
   _groundLayer:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 0
   _groundCheckRadius: 0.2
 --- !u!114 &4687647299867809364
 MonoBehaviour:
@@ -464,7 +465,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HammerTool
   _enemyLayer:
     serializedVersion: 2
-    m_Bits: 512
+    m_Bits: 0
 --- !u!114 &3204064320672524423
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -492,7 +493,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TapeMeasureTool
   _enemyLayer:
     serializedVersion: 2
-    m_Bits: 512
+    m_Bits: 0
   _extendSpeed: 16
 --- !u!114 &2644909439430470494
 MonoBehaviour:
@@ -521,7 +522,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BlowtorchTool
   _enemyLayer:
     serializedVersion: 2
-    m_Bits: 512
+    m_Bits: 0
 --- !u!114 &7724356658002470167
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -536,7 +537,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VacuumTool
   _enemyLayer:
     serializedVersion: 2
-    m_Bits: 512
+    m_Bits: 0
   _suckVFX: {fileID: 0}
   _burstVFX: {fileID: 0}
 --- !u!114 &8482052819309527723
@@ -553,7 +554,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MagnetTool
   _enemyLayer:
     serializedVersion: 2
-    m_Bits: 512
+    m_Bits: 0
   _beamWidth: 0.5
   _beamHeight: 2
   _beamLength: 50
@@ -572,7 +573,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ChainsawTool
   _enemyLayer:
     serializedVersion: 2
-    m_Bits: 512
+    m_Bits: 0
 --- !u!95 &1931199702937931968
 Animator:
   serializedVersion: 7
@@ -776,7 +777,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -922,7 +923,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2

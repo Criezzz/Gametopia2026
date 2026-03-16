@@ -79,4 +79,17 @@ public abstract class BaseTool : MonoBehaviour
         Vector2 dir = GetAttackDirection();
         return pos + dir * 0.5f; // Offset slightly forward
     }
+
+    protected LayerMask ResolveEnemyLayerMask(LayerMask configuredMask)
+    {
+        if (configuredMask.value != 0)
+            return configuredMask;
+
+        int enemyLayer = LayerMask.NameToLayer("Enemy");
+        if (enemyLayer >= 0)
+            return 1 << enemyLayer;
+
+        // Fallback when "Enemy" layer does not exist in project settings.
+        return ~0;
+    }
 }

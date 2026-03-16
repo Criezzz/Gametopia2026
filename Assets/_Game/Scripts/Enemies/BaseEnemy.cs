@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -36,6 +37,7 @@ public class BaseEnemy : MonoBehaviour
     [SerializeField] private Color _hitFlashColor = Color.black;
     [SerializeField] private float _hitFlashDuration = 0.12f;
     [SerializeField] private int _hitFlashCount = 2;
+    [SerializeField, Min(0f)] private float _hitTextMinInterval = 0.14f;
 
     [Header("Angry VFX")]
     [Tooltip("Child GameObject with SpriteRenderer + Animator for angry VFX. Disabled by default, enabled on MarkAsRespawned.")]
@@ -52,6 +54,8 @@ public class BaseEnemy : MonoBehaviour
     private Coroutine _flashCoroutine;
     private int _maxHP; // Runtime max HP (for health bar ratio)
     private EnemyHealthBar _healthBar;
+    private readonly Dictionary<int, float> _lastHitVfxSpawnTimes = new();
+    private readonly Dictionary<int, float> _lastHitTextSpawnTimes = new();
 
     protected virtual void Awake()
     {
@@ -158,6 +162,22 @@ public class BaseEnemy : MonoBehaviour
 
     public virtual void TakeDamage(int damage, ToolData toolData = null)
     {
+        // Backward-compatible path: keep legacy center-spawn behavior.
+        TakeDamageInternal(damage, toolData, false, transform.position, Vector2.right);
+    }
+
+    public virtual void TakeDamage(int damage, ToolData toolData, Vector2 hitPoint, Vector2 hitDirection)
+    {
+        TakeDamageInternal(damage, toolData, true, hitPoint, hitDirection);
+    }
+
+    private void TakeDamageInternal(
+        int damage,
+        ToolData toolData,
+        bool useDirectionalHitVFX,
+        Vector2 hitVfxPosition,
+        Vector2 hitDirection)
+    {
         if (_isDead) return;
 
         _currentHP -= damage;
@@ -165,7 +185,19 @@ public class BaseEnemy : MonoBehaviour
         // Hit VFX & SFX from the tool that dealt the blow
         if (toolData != null)
         {
-            VFXSpawner.Spawn(toolData.hitVFXPrefab, transform.position);
+            if (ShouldSpawnHitVFX(toolData))
+            {
+                if (useDirectionalHitVFX)
+                {
+                    Quaternion hitVfxRotation = GetDirectionalVfxRotation(toolData.hitVFXPrefab, hitDirection);
+                    VFXSpawner.Spawn(toolData.hitVFXPrefab, hitVfxPosition, hitVfxRotation);
+                }
+                else
+                {
+                    VFXSpawner.Spawn(toolData.hitVFXPrefab, transform.position);
+                }
+            }
+
             SpawnHitText(toolData);
 
             if (toolData.hitSFX != null && SFXManager.Instance != null)
@@ -186,7 +218,7 @@ public class BaseEnemy : MonoBehaviour
 
         if (_currentHP <= 0)
         {
-            Die();
+            Die(toolData);
         }
 
         UpdateHealthBar();
@@ -196,6 +228,7 @@ public class BaseEnemy : MonoBehaviour
     {
         if (toolData.hitTextPrefab == null || toolData.hitTextSprites == null
             || toolData.hitTextSprites.Length == 0) return;
+        if (!ShouldSpawnHitText(toolData)) return;
 
         Sprite sprite = toolData.hitTextSprites[Random.Range(0, toolData.hitTextSprites.Length)];
         Vector3 pos = transform.position + new Vector3(0f, 0.5f, 0f);
@@ -217,7 +250,7 @@ public class BaseEnemy : MonoBehaviour
         }
     }
 
-    protected virtual void Die()
+    protected virtual void Die(ToolData killingToolData = null)
     {
         _isDead = true;
 
@@ -228,6 +261,10 @@ public class BaseEnemy : MonoBehaviour
         // Death VFX from EnemyData
         if (_data != null)
             VFXSpawner.Spawn(_data.deathVFXPrefab, transform.position);
+
+        // Optional tool-specific kill VFX (e.g., blowtorch smoke puff on finishing blow)
+        if (killingToolData != null)
+            VFXSpawner.Spawn(killingToolData.killVFXPrefab, transform.position);
         
         // Broadcast Death Event
         _onEnemyKilled?.Raise();
@@ -247,6 +284,61 @@ public class BaseEnemy : MonoBehaviour
 
         // Destroy immediately — death drop handles the visual
         Destroy(gameObject);
+    }
+
+    private bool ShouldSpawnHitVFX(ToolData toolData)
+    {
+        if (toolData == null || toolData.hitVFXPrefab == null)
+            return false;
+
+        float minInterval = Mathf.Max(0f, toolData.hitVFXMinInterval);
+        if (minInterval <= 0f)
+            return true;
+
+        int key = toolData.GetInstanceID();
+        float now = Time.time;
+
+        if (_lastHitVfxSpawnTimes.TryGetValue(key, out float lastSpawnTime)
+            && now - lastSpawnTime < minInterval)
+        {
+            return false;
+        }
+
+        _lastHitVfxSpawnTimes[key] = now;
+        return true;
+    }
+
+    private static Quaternion GetDirectionalVfxRotation(GameObject hitVfxPrefab, Vector2 hitDirection)
+    {
+        Quaternion baseRotation = hitVfxPrefab != null ? hitVfxPrefab.transform.rotation : Quaternion.identity;
+        if (hitDirection.sqrMagnitude <= 0.0001f)
+            return baseRotation;
+
+        float zAngle = Mathf.Atan2(hitDirection.y, hitDirection.x) * Mathf.Rad2Deg;
+        Quaternion directionRotation = Quaternion.Euler(0f, 0f, zAngle);
+        return directionRotation * baseRotation;
+    }
+
+    private bool ShouldSpawnHitText(ToolData toolData)
+    {
+        if (toolData == null)
+            return false;
+
+        float minInterval = Mathf.Max(0f, _hitTextMinInterval);
+        if (minInterval <= 0f)
+            return true;
+
+        int key = toolData.GetInstanceID();
+        float now = Time.time;
+
+        if (_lastHitTextSpawnTimes.TryGetValue(key, out float lastSpawnTime)
+            && now - lastSpawnTime < minInterval)
+        {
+            return false;
+        }
+
+        _lastHitTextSpawnTimes[key] = now;
+        return true;
     }
 
     /// <summary>

@@ -17,6 +17,10 @@ public class PlayerController : MonoBehaviour
     [Header("Input")]
     [SerializeField] private PlayerInputHandler _inputHandler;
 
+    [Header("VFX")]
+    [Tooltip("Optional one-shot VFX prefab spawned when jump starts.")]
+    [SerializeField] private GameObject _jumpVFXPrefab;
+
     [Header("Ground Check")]
     [SerializeField] private Transform _groundCheckPoint;
     [SerializeField] private LayerMask _groundLayer;
@@ -134,6 +138,10 @@ public class PlayerController : MonoBehaviour
             _jumpCut = false;
             _jumpRequested = false;
             _jumpCooldownTimer = 0.15f;
+
+            // Jump VFX
+            if (_jumpVFXPrefab != null)
+                VFXSpawner.Spawn(_jumpVFXPrefab, transform.position, _jumpVFXPrefab.transform.rotation);
 
             // Jump SFX
             if (_data != null && _data.jumpSFX != null && SFXManager.Instance != null)

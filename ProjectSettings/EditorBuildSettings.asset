@@ -23,7 +23,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Game/Scenes/Game_Map2.unity
     guid: 85930ffe331b6ed48bd80a07ec2bb961
-  - enabled: 1
+  - enabled: 0
     path: Assets/_Game/Scenes/trailer.unity
     guid: ee199c9093083024b8d04aec051f9bdd
   - enabled: 1

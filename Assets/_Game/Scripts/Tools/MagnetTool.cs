@@ -43,15 +43,16 @@ public class MagnetTool : BaseTool
         // Origin shifted up slightly to cover player level and level above.
         Vector2 boxCenter = origin + new Vector2(0f, _verticalOffset);
         Vector2 boxSize = new Vector2(_beamWidth, _beamHeight);
+        LayerMask enemyMask = ResolveEnemyLayerMask(_enemyLayer);
 
         // Raycast forward — hits ALL enemies (pierce) using BoxCast for volume
         RaycastHit2D[] hits = Physics2D.BoxCastAll(
             boxCenter, boxSize, 0f, 
-            dir, _beamLength, _enemyLayer);
+            dir, _beamLength, enemyMask);
 
         foreach (var hit in hits)
         {
-            var enemy = hit.collider.GetComponent<BaseEnemy>();
+            var enemy = hit.collider.GetComponentInParent<BaseEnemy>();
             if (enemy != null)
             {
                 enemy.TakeDamage(damage, _toolData);

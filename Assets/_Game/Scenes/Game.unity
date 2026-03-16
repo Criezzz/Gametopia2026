@@ -2031,7 +2031,7 @@ PrefabInstance:
       objectReference: {fileID: -944628639613478452, guid: 651bcb522e5b85d49861e8ee7f459a6a, type: 3}
     - target: {fileID: 166959380042776419, guid: e93221ecf18706c4996371c5c5ae929f, type: 3}
       propertyPath: _enemyLayer.m_Bits
-      value: 512
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1172746956711957778, guid: e93221ecf18706c4996371c5c5ae929f, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2075,7 +2075,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1525061880012080540, guid: e93221ecf18706c4996371c5c5ae929f, type: 3}
       propertyPath: _enemyLayer.m_Bits
-      value: 512
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3758919826546375901, guid: e93221ecf18706c4996371c5c5ae929f, type: 3}
       propertyPath: m_Name
@@ -2087,11 +2087,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4062628176196221347, guid: e93221ecf18706c4996371c5c5ae929f, type: 3}
       propertyPath: _enemyLayer.m_Bits
-      value: 512
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4687647299867809364, guid: e93221ecf18706c4996371c5c5ae929f, type: 3}
       propertyPath: _enemyLayer.m_Bits
-      value: 512
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4691685812222822017, guid: e93221ecf18706c4996371c5c5ae929f, type: 3}
       propertyPath: _groundLayer.m_Bits
@@ -2103,11 +2103,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7724356658002470167, guid: e93221ecf18706c4996371c5c5ae929f, type: 3}
       propertyPath: _enemyLayer.m_Bits
-      value: 512
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8482052819309527723, guid: e93221ecf18706c4996371c5c5ae929f, type: 3}
       propertyPath: _enemyLayer.m_Bits
-      value: 512
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:

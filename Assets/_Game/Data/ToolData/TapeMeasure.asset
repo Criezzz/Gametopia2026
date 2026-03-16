@@ -15,7 +15,7 @@ MonoBehaviour:
   toolName: Tape Measure
   description: Whip forward 4 units. Hits on extend and retract.
   toolType: 1
-  unlockScore: 5
+  unlockPickupCount: 5
   baseWeight: 97
   damage: 8
   secondaryDamage: 5
@@ -33,7 +33,10 @@ MonoBehaviour:
   secondaryAttackSFX: {fileID: 0}
   hitSFX: {fileID: 0}
   hitVFXPrefab: {fileID: 0}
+  hitVFXMinInterval: 0
+  killVFXPrefab: {fileID: 0}
   hitTextPrefab: {fileID: 429878832413004069, guid: 1c495891e77ceb3449731dbe9cae7539, type: 3}
   hitTextSprites:
-  - {fileID: -7575284744764469784, guid: 53238e97b964ac24681b89a82e6c6aff, type: 3}
-  - {fileID: -7956655330049976835, guid: cc72073dbd9ed7e4182d07679efa8715, type: 3}
+  - {fileID: 21300000, guid: 53238e97b964ac24681b89a82e6c6aff, type: 3}
+  - {fileID: 21300000, guid: 46950e53abc455848adfa6e8e7cb4008, type: 3}
+  - {fileID: 21300000, guid: cc72073dbd9ed7e4182d07679efa8715, type: 3}

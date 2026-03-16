@@ -93,10 +93,11 @@ public class TapeMeasureTool : BaseTool
     {
         Vector2 origin = (Vector2)transform.position;
         Vector2 dir = GetAttackDirection();
+        LayerMask enemyMask = ResolveEnemyLayerMask(_enemyLayer);
 
         // Thin box along the tape
         RaycastHit2D[] hits = Physics2D.BoxCastAll(
-            origin, new Vector2(0.2f, 0.5f), 0f, dir, _currentLength, _enemyLayer);
+            origin, new Vector2(0.2f, 0.5f), 0f, dir, _currentLength, enemyMask);
 
         foreach (var hit in hits)
         {
@@ -104,7 +105,7 @@ public class TapeMeasureTool : BaseTool
             if (!hitSet.Contains(id))
             {
                 hitSet.Add(id);
-                var enemy = hit.collider.GetComponent<BaseEnemy>();
+                var enemy = hit.collider.GetComponentInParent<BaseEnemy>();
                 if (enemy != null)
                 {
                     enemy.TakeDamage(damageToApply, _toolData);

@@ -44,12 +44,13 @@ public class BlowtorchTool : BaseTool
         Vector2 boxSize = new Vector2(_range, 2.0f);
         // Shift up slightly by 0.5 to hit player level and exactly one level above
         Vector2 boxCenter = origin + dir * (_range * 0.5f) + new Vector2(0f, 0.5f);
+        LayerMask enemyMask = ResolveEnemyLayerMask(_enemyLayer);
 
-        Collider2D[] hits = Physics2D.OverlapBoxAll(boxCenter, boxSize, 0f, _enemyLayer);
+        Collider2D[] hits = Physics2D.OverlapBoxAll(boxCenter, boxSize, 0f, enemyMask);
 
         foreach (var hit in hits)
         {
-            var enemy = hit.GetComponent<BaseEnemy>();
+            var enemy = hit.GetComponentInParent<BaseEnemy>();
             if (enemy != null)
             {
                 enemy.TakeDamage(damage, _toolData);

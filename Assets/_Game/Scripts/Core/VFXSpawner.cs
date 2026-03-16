@@ -6,9 +6,15 @@ public static class VFXSpawner
     /// Instantiate a VFX prefab at position. Auto-destroys non-looping ParticleSystems.
     public static void Spawn(GameObject prefab, Vector3 position)
     {
+        Spawn(prefab, position, Quaternion.identity);
+    }
+
+    /// Instantiate a VFX prefab at position with explicit rotation.
+    public static void Spawn(GameObject prefab, Vector3 position, Quaternion rotation)
+    {
         if (prefab == null) return;
 
-        var vfx = Object.Instantiate(prefab, position, Quaternion.identity);
+        var vfx = Object.Instantiate(prefab, position, rotation);
         var ps = vfx.GetComponent<ParticleSystem>();
         if (ps != null && !ps.main.loop)
         {

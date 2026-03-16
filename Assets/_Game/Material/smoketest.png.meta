@@ -1,19 +1,10 @@
 fileFormatVersion: 2
-guid: cc72073dbd9ed7e4182d07679efa8715
+guid: 0654b5423ef4e1d4e940b31bda90f5c1
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7956655330049976835
-    second: Whip_0
-  - first:
-      213: 8540062214991249977
-    second: Whip_1
-  - first:
-      213: 5765087011866300799
-    second: Whip_2
-  - first:
-      213: 3170501647615189412
-    second: Whip_3
+      213: -3684901811025910059
+    second: smoketest_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -55,12 +46,12 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 16
+  spritePixelsToUnits: 12
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -106,37 +97,11 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 4
-    buildTarget: Android
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WindowsStoreApps
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
     buildTarget: WebGL
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 2
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -148,89 +113,67 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Whip_0
+      name: smoketest_0
       rect:
         serializedVersion: 2
-        x: 15
-        y: 26
+        x: 0
+        y: 0
         width: 16
-        height: 13
+        height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: df5172c2228449190800000000000000
-      internalID: -7956655330049976835
+      spriteID: 5d66b9983599cdcc0800000000000000
+      internalID: -3684901811025910059
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Whip_1
+      name: smoketest_1
       rect:
         serializedVersion: 2
-        x: 24
-        y: 27
-        width: 15
-        height: 11
+        x: 16
+        y: 0
+        width: 16
+        height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 9320a4c5655648670800000000000000
-      internalID: 8540062214991249977
+      spriteID: 19512dcd2b1bc2249b47b9be59408f33
+      internalID: -1460395449
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Whip_2
+      name: smoketest_2
       rect:
         serializedVersion: 2
-        x: 35
-        y: 27
-        width: 8
-        height: 11
+        x: 32
+        y: 0
+        width: 16
+        height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: f715281b714b10050800000000000000
-      internalID: 5765087011866300799
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Whip_3
-      rect:
-        serializedVersion: 2
-        x: 39
-        y: 26
-        width: 13
-        height: 13
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 4a1e4e15372effb20800000000000000
-      internalID: 3170501647615189412
+      spriteID: 517db6ee77ae71e408c0cd6dff2e6304
+      internalID: 203416233
       vertices: []
       indices: 
       edges: []
@@ -239,7 +182,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: d4b343656f0957f42b5ff5dee535c3ef
     internalID: 0
     vertices: []
     indices: 
@@ -247,12 +190,13 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":16.0,"y":16.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      Whip_0: -7956655330049976835
-      Whip_1: 8540062214991249977
-      Whip_2: 5765087011866300799
-      Whip_3: 3170501647615189412
+      smoketest_0: -3684901811025910059
+      smoketest_1: -1460395449
+      smoketest_2: 203416233
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

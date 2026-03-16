@@ -97,12 +97,13 @@ public class VacuumTool : BaseTool
 
             Vector2 boxSize = new Vector2(_suckRange, 1f);
             Vector2 boxCenter = pos + dir * (_suckRange * 0.5f);
+            LayerMask enemyMask = ResolveEnemyLayerMask(_enemyLayer);
 
-            Collider2D[] hits = Physics2D.OverlapBoxAll(boxCenter, boxSize, 0f, _enemyLayer);
+            Collider2D[] hits = Physics2D.OverlapBoxAll(boxCenter, boxSize, 0f, enemyMask);
 
             foreach (var hit in hits)
             {
-                var enemy = hit.GetComponent<BaseEnemy>();
+                var enemy = hit.GetComponentInParent<BaseEnemy>();
                 if (enemy != null && enemy.IsSmall && !_suckedEnemies.Contains(enemy.gameObject))
                 {
                     // Suck this enemy in — smooth pull toward player + scale down

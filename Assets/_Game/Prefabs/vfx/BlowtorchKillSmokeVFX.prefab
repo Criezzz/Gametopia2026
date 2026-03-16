@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1285147713376968171}
   - component: {fileID: 6782022354052844961}
   m_Layer: 0
-  m_Name: BlowtorchHitVFX
+  m_Name: BlowtorchKillSmokeVFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -41,7 +41,7 @@ ParticleSystem:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4292059699018276470}
   serializedVersion: 8
-  lengthInSec: 0.3
+  lengthInSec: 0.35
   simulationSpeed: 1
   stopAction: 2
   cullingMode: 0
@@ -116,8 +116,8 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.2
-      minScalar: 0.12
+      scalar: 0.5
+      minScalar: 0.32
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -169,8 +169,8 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 5
-      minScalar: 5
+      scalar: 1
+      minScalar: 0.8
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -222,8 +222,8 @@ ParticleSystem:
     startColor:
       serializedVersion: 2
       minMaxState: 0
-      minColor: {r: 1, g: 0.8352941, b: 0.41568628, a: 1}
-      maxColor: {r: 1, g: 0.60784316, b: 0.23921569, a: 1}
+      minColor: {r: 0.19, g: 0.17, b: 0.15, a: 0.5}
+      maxColor: {r: 0.26, g: 0.23, b: 0.2, a: 0.4}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -287,8 +287,8 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.4
-      minScalar: 0.12
+      scalar: 0.35
+      minScalar: 0.26
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -603,8 +603,8 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     randomizeRotationDirection: 0
-    gravitySource: 1
-    maxNumParticles: 64
+    gravitySource: 0
+    maxNumParticles: 8
     customEmitterVelocity: {x: 0, y: 0, z: 0}
     size3D: 0
     rotation3D: 0
@@ -612,7 +612,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       scalar: 0
-      minScalar: 0
+      minScalar: -0.2
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -665,8 +665,8 @@ ParticleSystem:
     serializedVersion: 6
     enabled: 1
     type: 4
-    angle: 8
-    length: 0.35
+    angle: 16
+    length: 0.2
     boxThickness: {x: 0, y: 0, z: 0}
     radiusThickness: 1
     donutRadius: 0.2
@@ -751,7 +751,7 @@ ParticleSystem:
     sphericalDirectionAmount: 0
     randomPositionAmount: 0
     radius:
-      value: 0.35
+      value: 0.08
       mode: 0
       spread: 0
       speed:
@@ -870,8 +870,8 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 30
-      minScalar: 40
+      scalar: 11
+      minScalar: 11
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -3551,7 +3551,7 @@ ParticleSystem:
     separateAxes: 0
     range: {x: 0, y: 1}
   ColorBySpeedModule:
-    enabled: 1
+    enabled: 0
     gradient:
       serializedVersion: 2
       minMaxState: 1
@@ -3559,8 +3559,8 @@ ParticleSystem:
       maxColor: {r: 1, g: 1, b: 1, a: 1}
       maxGradient:
         serializedVersion: 2
-        key0: {r: 1, g: 0.8352941, b: 0.41568628, a: 1}
-        key1: {r: 0.8784314, g: 0.33333334, b: 0.1764706, a: 0}
+        key0: {r: 0.26, g: 0.23, b: 0.2, a: 0.45}
+        key1: {r: 0.1, g: 0.09, b: 0.08, a: 0}
         key2: {r: 0, g: 0, b: 0, a: 0}
         key3: {r: 0, g: 0, b: 0, a: 0}
         key4: {r: 0, g: 0, b: 0, a: 0}
@@ -3589,8 +3589,8 @@ ParticleSystem:
         m_NumAlphaKeys: 2
       minGradient:
         serializedVersion: 2
-        key0: {r: 1, g: 0.8352941, b: 0.41568628, a: 1}
-        key1: {r: 0.8784314, g: 0.33333334, b: 0.1764706, a: 0}
+        key0: {r: 0.26, g: 0.23, b: 0.2, a: 0.45}
+        key1: {r: 0.1, g: 0.09, b: 0.08, a: 0}
         key2: {r: 0, g: 0, b: 0, a: 0}
         key3: {r: 0, g: 0, b: 0, a: 0}
         key4: {r: 0, g: 0, b: 0, a: 0}
@@ -3617,7 +3617,7 @@ ParticleSystem:
         m_ColorSpace: -1
         m_NumColorKeys: 2
         m_NumAlphaKeys: 2
-    range: {x: 0, y: 6}
+    range: {x: 0, y: 1}
   CollisionModule:
     enabled: 0
     serializedVersion: 4
@@ -4782,7 +4782,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c5fc0e483c826ae47ad8801e56a94c4b, type: 2}
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

@@ -185,7 +185,7 @@ MonoBehaviour:
   _isSmall: 1
   _onEnemyKilled: {fileID: 11400000, guid: 0873a5e2790900c48baf91dbf9b7b46b, type: 2}
   _onEnemyFell: {fileID: 11400000, guid: f6c38e71a4a14844ea4b6fa367560369, type: 2}
-  _onDeathDrop: {fileID: 0}
+  _onDeathDrop: {fileID: 11400000, guid: ab69a150181d3864c86df05e83f37ff7, type: 2}
   _fallOffset: 3
   _animator: {fileID: 2345678901234567890}
   _hitFlashColor: {r: 1, g: 1, b: 1, a: 1}

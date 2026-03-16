@@ -43,12 +43,13 @@ public class ChainsawTool : BaseTool
         // Hitbox in front, 2 units
         Vector2 boxSize = new Vector2(_range, 0.8f);
         Vector2 boxCenter = origin + dir * (_range * 0.5f);
+        LayerMask enemyMask = ResolveEnemyLayerMask(_enemyLayer);
 
-        Collider2D[] hits = Physics2D.OverlapBoxAll(boxCenter, boxSize, 0f, _enemyLayer);
+        Collider2D[] hits = Physics2D.OverlapBoxAll(boxCenter, boxSize, 0f, enemyMask);
 
         foreach (var hit in hits)
         {
-            var enemy = hit.GetComponent<BaseEnemy>();
+            var enemy = hit.GetComponentInParent<BaseEnemy>();
             if (enemy != null)
             {
                 enemy.TakeDamage(damage, _toolData);

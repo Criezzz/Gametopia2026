@@ -57,10 +57,15 @@ public class ToolProjectile : MonoBehaviour
             return;
         }
 
-        var enemy = other.GetComponent<BaseEnemy>();
+        var enemy = other.GetComponentInParent<BaseEnemy>();
         if (enemy != null)
         {
-            enemy.TakeDamage(_damage, _toolData);
+            Vector2 hitPoint = other.ClosestPoint(transform.position);
+            Vector2 hitDirection = (_rb != null && _rb.linearVelocity.sqrMagnitude > 0.0001f)
+                ? _rb.linearVelocity.normalized
+                : (Vector2)transform.right;
+
+            enemy.TakeDamage(_damage, _toolData, hitPoint, hitDirection);
             if (!_pierce)
                 Destroy(gameObject);
         }

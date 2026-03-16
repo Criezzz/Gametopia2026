@@ -68,6 +68,10 @@ public class ToolData : ScriptableObject
     [Header("VFX")]
     [Tooltip("Particle prefab spawned at enemy position on hit")]
     public GameObject hitVFXPrefab;
+    [Tooltip("Minimum interval between hit VFX spawns on the same enemy (seconds). 0 = every hit.")]
+    [Min(0f)] public float hitVFXMinInterval = 0f;
+    [Tooltip("Optional one-shot VFX spawned when this tool lands the killing blow.")]
+    public GameObject killVFXPrefab;
     [Tooltip("Prefab with HitTextPopup + SpriteRenderer (white sprite). Spawned on hit.")]
     public GameObject hitTextPrefab;
     [Tooltip("White pixel-art text sprites (WHACK, POW, BAM…). One picked at random per hit.")]
