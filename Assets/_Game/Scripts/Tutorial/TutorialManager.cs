@@ -29,7 +29,7 @@ public class TutorialManager : MonoBehaviour
     [Header("Crate (Phase 2)")]
     [SerializeField] private Toolbox _toolboxPrefab;
     [SerializeField] private Transform _crateSpawnPoint;
-    [Tooltip("Highest tool the tutorial is allowed to unlock. Tools above this are blocked.")]
+    [Tooltip("Highest tool pickup-threshold the tutorial is allowed to unlock. Tools above this are blocked.")]
     [SerializeField] private ToolData _maxUnlockTool;
 
     [Header("Enemy (Phase 3)")]
@@ -96,18 +96,18 @@ public class TutorialManager : MonoBehaviour
 
     private void Start()
     {
-        ApplyTutorialUnlockCap();
+        ApplyTutorialUnlockPickupCap();
         CacheSpawnerConfig();
         DisableEnemySpawner();
-        DestroyAutoSpawnedToolbox();
+        DestroyAllToolboxes();
 
         StartCoroutine(RunTutorial());
     }
 
-    private void ApplyTutorialUnlockCap()
+    private void ApplyTutorialUnlockPickupCap()
     {
         if (_maxUnlockTool != null)
-            GameManager.TutorialUnlockCap = _maxUnlockTool.unlockScore;
+            GameManager.TutorialUnlockPickupCap = _maxUnlockTool.unlockPickupCount;
     }
 
     private void OnEnable()
@@ -150,11 +150,6 @@ public class TutorialManager : MonoBehaviour
             _spawner.enabled = false;
     }
 
-    private void DestroyAutoSpawnedToolbox()
-    {
-        DestroyAllToolboxes();
-    }
-
     private void DestroyAllToolboxes()
     {
         var boxes = Object.FindObjectsByType<Toolbox>(FindObjectsSortMode.None);
@@ -188,7 +183,8 @@ public class TutorialManager : MonoBehaviour
 
     private void ShowText(string template)
     {
-        _tutorialUI.ShowMessage(Fmt(template));
+        if (_tutorialUI != null)
+            _tutorialUI.ShowMessage(Fmt(template));
     }
 
     // ─────────────────────── Main Tutorial Coroutine ───────────────────────
@@ -338,7 +334,7 @@ public class TutorialManager : MonoBehaviour
         _tutorialUI.HideMessage();
     }
 
-    private void OnCratePickedUp(int playerIndex)
+    private void OnCratePickedUp(int _)
     {
         if (_currentPhase == TutorialPhase.Crate)
             _cratePickedUp = true;
@@ -381,10 +377,11 @@ public class TutorialManager : MonoBehaviour
     private void HandleEnemyFell(EnemyFallData data)
     {
         if (_currentPhase != TutorialPhase.Enemy) return;
-        if (data.enemyData == null || _walkerEnemyPrefab == null || Camera.main == null) return;
+        Camera cam = Camera.main;
+        if (data.enemyData == null || _walkerEnemyPrefab == null || cam == null) return;
 
         float x = Random.value < 0.5f ? _spawnXLeft : _spawnXRight;
-        float y = Camera.main.transform.position.y + Camera.main.orthographicSize + _spawnYOffset;
+        float y = cam.transform.position.y + cam.orthographicSize + _spawnYOffset;
 
         GameObject newEnemy = Instantiate(_walkerEnemyPrefab, new Vector2(x, y), Quaternion.identity);
         BaseEnemy baseEnemy = newEnemy.GetComponent<BaseEnemy>();

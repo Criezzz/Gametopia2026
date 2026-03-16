@@ -7,15 +7,15 @@ using UnityEngine;
 public class HitTextPopup : MonoBehaviour
 {
     [Header("Motion")]
-    [SerializeField] private float _launchSpeed = 3.5f;
-    [SerializeField] private float _gravity = 6f;
+    [SerializeField] private float _launchSpeed = 6f;
+    [SerializeField] private float _gravity = 8f;
     [SerializeField] private float _minAngle = 30f;
     [SerializeField] private float _maxAngle = 150f;
 
     [Header("Scale Punch")]
     [SerializeField] private float _punchScale = 1.5f;
-    [SerializeField] private float _settleScale = 1f;
-    [SerializeField] private float _punchDuration = 0.15f;
+    [SerializeField] private float _settleScale = 0.7f;
+    [SerializeField] private float _punchDuration = 0.2f;
 
     [Header("Color Cycle")]
     [SerializeField] private Color[] _colors = new[]
@@ -25,10 +25,10 @@ public class HitTextPopup : MonoBehaviour
         new Color(1f, 0.4f, 0.1f), // orange
         Color.cyan
     };
-    [SerializeField] private float _colorInterval = 0.06f;
+    [SerializeField] private float _colorInterval = 0.12f;
 
     [Header("Lifetime")]
-    [SerializeField] private float _lifetime = 0.7f;
+    [SerializeField] private float _lifetime = 0.5f;
     [SerializeField] private float _fadeStartRatio = 0.6f;
 
     [Header("Rendering")]

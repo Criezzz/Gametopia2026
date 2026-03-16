@@ -19,6 +19,7 @@ using UnityEngine;
 public static class SaveManager
 {
     private const string FileName = "save_data.json";
+    private const string LegacyHighScoreKey = "HighScore";
 
     private static SaveData _data;
 
@@ -124,13 +125,16 @@ public static class SaveManager
             File.Delete(path);
 
         // Also clear legacy PlayerPrefs key
-        PlayerPrefs.DeleteKey("HighScore");
+        PlayerPrefs.DeleteKey(LegacyHighScoreKey);
         PlayerPrefs.Save();
 
         _data = new SaveData();
         Save();
-        Debug.Log($"[SaveManager] Save data RESET. highScore: 0");
+        Debug.Log("[SaveManager] Save data reset to defaults.");
     }
+
+    private const string BGMVolumeKey = "BGMVolume";
+    private const string SFXVolumeKey = "SFXVolume";
 
     private static void SanitizeData()
     {
@@ -142,6 +146,34 @@ public static class SaveManager
 
         if (_data.highScore < 0)
             _data.highScore = 0;
+
+        if (_data.totalToolPickups < 0)
+            _data.totalToolPickups = 0;
+
+        // Migration safety: old versions unlocked tools by high score.
+        // Keep existing unlock progression when moving to pickup-based milestones.
+        if (_data.totalToolPickups < _data.highScore)
+            _data.totalToolPickups = _data.highScore;
+
+        // Migrate volume from legacy PlayerPrefs if present
+        bool migrated = false;
+        if (PlayerPrefs.HasKey(BGMVolumeKey))
+        {
+            _data.bgmVolume = PlayerPrefs.GetFloat(BGMVolumeKey, 0.75f);
+            PlayerPrefs.DeleteKey(BGMVolumeKey);
+            migrated = true;
+        }
+        if (PlayerPrefs.HasKey(SFXVolumeKey))
+        {
+            _data.sfxVolume = PlayerPrefs.GetFloat(SFXVolumeKey, 0.75f);
+            PlayerPrefs.DeleteKey(SFXVolumeKey);
+            migrated = true;
+        }
+        if (migrated)
+            PlayerPrefs.Save();
+
+        _data.bgmVolume = Mathf.Clamp01(_data.bgmVolume);
+        _data.sfxVolume = Mathf.Clamp01(_data.sfxVolume);
     }
 
     private static string NormalizeMapId(string mapId)

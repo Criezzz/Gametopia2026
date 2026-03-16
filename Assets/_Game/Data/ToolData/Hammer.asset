@@ -35,6 +35,6 @@ MonoBehaviour:
   hitVFXPrefab: {fileID: 8378573448782073372, guid: 7367bdd0441b6514e8ea07f8edde1abb, type: 3}
   hitTextPrefab: {fileID: 429878832413004069, guid: 1c495891e77ceb3449731dbe9cae7539, type: 3}
   hitTextSprites:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 21300000, guid: 699998db2c552b940b1423ab297d4fa3, type: 3}
+  - {fileID: 21300000, guid: 2f6bc080d1f0aa245a19d77462de02e3, type: 3}
+  - {fileID: 21300000, guid: 99a8defd4f2be1240ad70cfce6503359, type: 3}

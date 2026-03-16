@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 /// <summary>
 /// Data passed when an enemy dies and a death-drop sprite should be spawned.
@@ -11,6 +12,11 @@ public struct DeathDropData
 
     /// <summary>World position where the enemy died.</summary>
     public Vector2 position;
+
+    /// <summary>
+    /// Optional callback invoked when the spawned drop effect finishes and is destroyed.
+    /// </summary>
+    public Action onComplete;
 }
 
 /// <summary>

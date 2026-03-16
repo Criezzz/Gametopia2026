@@ -16,17 +16,17 @@ public class UpdateToolData
         UpdateTool("Magnet", 50, 95f);
         UpdateTool("Chainsaw", 67, 90f);
         AssetDatabase.SaveAssets();
-        Debug.Log("[UpdateToolData] Tool thresholds (unlockScore) and weights (baseWeight) updated!");
+        Debug.Log("[UpdateToolData] Tool thresholds (unlockPickupCount) and weights (baseWeight) updated!");
     }
 
-    private static void UpdateTool(string name, int score, float weight)
+    private static void UpdateTool(string name, int pickupCount, float weight)
     {
         var dt = AssetDatabase.LoadAssetAtPath<ToolData>($"Assets/_Game/Data/ToolData/{name}.asset");
         if(dt != null)
         {
             var so = new SerializedObject(dt);
-            var scoreProp = so.FindProperty("unlockScore");
-            if (scoreProp != null) scoreProp.intValue = score;
+            var pickupProp = so.FindProperty("unlockPickupCount");
+            if (pickupProp != null) pickupProp.intValue = pickupCount;
             
             var weightProp = so.FindProperty("baseWeight");
             if (weightProp != null) weightProp.floatValue = weight;

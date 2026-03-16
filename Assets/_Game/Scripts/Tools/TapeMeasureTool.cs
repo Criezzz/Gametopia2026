@@ -120,17 +120,4 @@ public class TapeMeasureTool : BaseTool
         _isRetracting = false;
         _currentLength = 0f;
     }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = new Color(0f, 1f, 1f, 0.5f); // Cyan half-transparent
-        Vector2 origin = (Vector2)transform.position;
-        Vector2 dir = GetAttackDirection();
-        float length = _currentLength > 0 ? _currentLength : (_maxLength > 0 ? _maxLength : 4f);
-        
-        Vector2 boxSize = new Vector2(0.2f, 0.5f);
-        // Gizmos.DrawWireCube takes center. BoxCast goes from origin to origin + dir * length
-        Vector2 center = origin + dir * (length * 0.5f);
-        Gizmos.DrawWireCube(center, new Vector3(dir.x != 0 ? length : boxSize.x, dir.y != 0 ? length : boxSize.y, 1f));
-    }
 }

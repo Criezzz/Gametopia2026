@@ -86,21 +86,19 @@ public class SettingsUI : MonoBehaviour
 
     #region Volume
 
-    private const string BGMVolumeKey = "BGMVolume";
-    private const string SFXVolumeKey = "SFXVolume";
-
     private void SetupVolumeSliders()
     {
+        var data = SaveManager.Data;
         if (_bgmSlider != null)
         {
-            _bgmSlider.value = PlayerPrefs.GetFloat(BGMVolumeKey, 0.75f);
+            _bgmSlider.value = data.bgmVolume;
             ApplyVolume("BGMVolume", _bgmSlider.value);
             _bgmSlider.onValueChanged.AddListener(OnBGMVolumeChanged);
         }
 
         if (_sfxSlider != null)
         {
-            _sfxSlider.value = PlayerPrefs.GetFloat(SFXVolumeKey, 0.75f);
+            _sfxSlider.value = data.sfxVolume;
             ApplyVolume("SFXVolume", _sfxSlider.value);
             _sfxSlider.onValueChanged.AddListener(OnSFXVolumeChanged);
         }
@@ -109,13 +107,15 @@ public class SettingsUI : MonoBehaviour
     private void OnBGMVolumeChanged(float value)
     {
         ApplyVolume("BGMVolume", value);
-        PlayerPrefs.SetFloat(BGMVolumeKey, value);
+        SaveManager.Data.bgmVolume = value;
+        SaveManager.Save();
     }
 
     private void OnSFXVolumeChanged(float value)
     {
         ApplyVolume("SFXVolume", value);
-        PlayerPrefs.SetFloat(SFXVolumeKey, value);
+        SaveManager.Data.sfxVolume = value;
+        SaveManager.Save();
     }
 
     private void ApplyVolume(string paramName, float linearValue)
@@ -254,8 +254,19 @@ public class SettingsUI : MonoBehaviour
         if (_conflictWarning != null) _conflictWarning.gameObject.SetActive(false);
 
         // Reset volume to defaults
-        if (_bgmSlider != null) _bgmSlider.value = 0.75f;
-        if (_sfxSlider != null) _sfxSlider.value = 0.75f;
+        if (_bgmSlider != null)
+        {
+            _bgmSlider.value = 0.75f;
+            ApplyVolume("BGMVolume", 0.75f);
+        }
+        if (_sfxSlider != null)
+        {
+            _sfxSlider.value = 0.75f;
+            ApplyVolume("SFXVolume", 0.75f);
+        }
+        SaveManager.Data.bgmVolume = 0.75f;
+        SaveManager.Data.sfxVolume = 0.75f;
+        SaveManager.Save();
     }
 
     private void OnBackClicked()

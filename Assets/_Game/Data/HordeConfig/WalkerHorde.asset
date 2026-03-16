@@ -15,8 +15,8 @@ MonoBehaviour:
   enemyPrefab: {fileID: 791364067927016839, guid: e24c9d6fda0135645aa4725dc061cace, type: 3}
   enemyCount: 3
   delayBetweenSpawns: 0.35
-  firstHordeDelay: 8
+  firstHordeDelay: 3
   hordeInterval: 6
-  difficultyTickInterval: 15
-  intervalReductionPerTick: 0.2
-  minHordeInterval: 5
+  difficultyTickInterval: 10
+  intervalReductionPerTick: 0.5
+  minHordeInterval: 3

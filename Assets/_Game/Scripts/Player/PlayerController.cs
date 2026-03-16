@@ -49,6 +49,7 @@ public class PlayerController : MonoBehaviour
     private float _initialJumpVelocity;
 
     private const float CEILING_CHECK_DISTANCE = 0.05f;
+    private Collider2D[] _cachedColliders;
 
     private void Awake()
     {
@@ -60,7 +61,20 @@ public class PlayerController : MonoBehaviour
         if (_inputHandler == null)
             _inputHandler = GetComponent<PlayerInputHandler>();
 
+        ApplyPlayerCollisionSetup();
+
         CacheJumpPhysics();
+    }
+
+    private void Start()
+    {
+        // Ensure all PlayerController instances are present before pair-wise ignore setup.
+        ApplyPlayerCollisionSetup();
+    }
+
+    private void OnEnable()
+    {
+        ApplyPlayerCollisionSetup();
     }
 
     // g = 2h / t²  |  v₀ = 2h / t
@@ -250,6 +264,56 @@ public class PlayerController : MonoBehaviour
         }
 
         return false;
+    }
+
+    private void ApplyPlayerCollisionSetup()
+    {
+        int playerLayer = LayerMask.NameToLayer("Player");
+        if (playerLayer >= 0)
+        {
+            SetLayerRecursively(transform, playerLayer);
+            Physics2D.IgnoreLayerCollision(playerLayer, playerLayer, true);
+        }
+
+        // Fallback that does not rely on project layer names.
+        IgnoreCollisionsWithOtherPlayers();
+    }
+
+    private void IgnoreCollisionsWithOtherPlayers()
+    {
+        _cachedColliders = GetComponentsInChildren<Collider2D>(true);
+        if (_cachedColliders == null || _cachedColliders.Length == 0)
+            return;
+
+        var allPlayers = FindObjectsByType<PlayerController>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+        for (int i = 0; i < allPlayers.Length; i++)
+        {
+            PlayerController other = allPlayers[i];
+            if (other == null || other == this)
+                continue;
+
+            var otherColliders = other.GetComponentsInChildren<Collider2D>(true);
+            for (int a = 0; a < _cachedColliders.Length; a++)
+            {
+                Collider2D mine = _cachedColliders[a];
+                if (mine == null) continue;
+
+                for (int b = 0; b < otherColliders.Length; b++)
+                {
+                    Collider2D theirs = otherColliders[b];
+                    if (theirs == null) continue;
+                    Physics2D.IgnoreCollision(mine, theirs, true);
+                }
+            }
+        }
+    }
+
+    private static void SetLayerRecursively(Transform root, int layer)
+    {
+        if (root == null) return;
+        root.gameObject.layer = layer;
+        for (int i = 0; i < root.childCount; i++)
+            SetLayerRecursively(root.GetChild(i), layer);
     }
 
 #if UNITY_EDITOR

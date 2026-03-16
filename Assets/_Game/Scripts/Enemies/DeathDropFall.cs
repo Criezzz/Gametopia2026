@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 /// <summary>
 /// Moves a death-drop sprite in a pop-up arc then falls with gravity.
@@ -10,6 +11,8 @@ public class DeathDropFall : MonoBehaviour
     private float _gravity;
     private float _destroyY;
     private float _rotateSpeed;
+    private Action _onFinished;
+    private bool _didNotifyFinished;
 
     /// <summary>
     /// Set up the drop physics.
@@ -18,12 +21,19 @@ public class DeathDropFall : MonoBehaviour
     /// <param name="gravity">Downward acceleration (positive value, e.g. 25)</param>
     /// <param name="destroyY">Y position below which the object is destroyed</param>
     /// <param name="rotateSpeed">Spin speed in degrees/sec (0 = no spin)</param>
-    public void Initialize(Vector2 initialVelocity, float gravity, float destroyY, float rotateSpeed = 0f)
+    public void Initialize(
+        Vector2 initialVelocity,
+        float gravity,
+        float destroyY,
+        float rotateSpeed = 0f,
+        Action onFinished = null)
     {
         _velocity = initialVelocity;
         _gravity = gravity;
         _destroyY = destroyY;
         _rotateSpeed = rotateSpeed;
+        _onFinished = onFinished;
+        _didNotifyFinished = false;
     }
 
     /// <summary>
@@ -34,6 +44,9 @@ public class DeathDropFall : MonoBehaviour
         _velocity = new Vector2(0f, 0f);
         _gravity = fallSpeed * 2f;
         _destroyY = destroyY;
+        _rotateSpeed = 0f;
+        _onFinished = null;
+        _didNotifyFinished = false;
     }
 
     private void Update()
@@ -49,6 +62,19 @@ public class DeathDropFall : MonoBehaviour
             transform.Rotate(0f, 0f, _rotateSpeed * Time.deltaTime);
 
         if (transform.position.y < _destroyY)
-            Destroy(gameObject);
+            FinishAndDestroy();
+    }
+
+    private void FinishAndDestroy()
+    {
+        NotifyFinishedOnce();
+        Destroy(gameObject);
+    }
+
+    private void NotifyFinishedOnce()
+    {
+        if (_didNotifyFinished) return;
+        _didNotifyFinished = true;
+        _onFinished?.Invoke();
     }
 }

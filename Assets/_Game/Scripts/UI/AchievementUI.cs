@@ -80,7 +80,7 @@ public class AchievementUI : MonoBehaviour
         {
             if (slot.toolData == null) continue;
 
-            bool unlocked = data.highScore >= slot.toolData.unlockScore;
+            bool unlocked = data.totalToolPickups >= slot.toolData.unlockPickupCount;
             if (slot.lockedIcon != null) slot.lockedIcon.SetActive(!unlocked);
             if (slot.unlockedIcon != null)
             {
@@ -97,7 +97,7 @@ public class AchievementUI : MonoBehaviour
 
             if (slot.labelText != null)
             {
-                string status = unlocked ? "UNLOCKED" : $"Score {slot.toolData.unlockScore}";
+                string status = unlocked ? "UNLOCKED" : $"Pickups {slot.toolData.unlockPickupCount}";
                 slot.labelText.text = $"{slot.toolData.toolName}\n{status}";
             }
         }
@@ -209,8 +209,8 @@ public class AchievementUI : MonoBehaviour
         if (_tooltipPanel == null || _tooltipText == null || slot.toolData == null) return;
 
         var t = slot.toolData;
-        bool unlocked = SaveManager.Data.highScore >= t.unlockScore;
-        string unlockLine = unlocked ? "<color=#66FF66>UNLOCKED</color>" : $"<color=#FFAA33>Unlock: Score {t.unlockScore}</color>";
+        bool unlocked = SaveManager.Data.totalToolPickups >= t.unlockPickupCount;
+        string unlockLine = unlocked ? "<color=#66FF66>UNLOCKED</color>" : $"<color=#FFAA33>Unlock: Pickups {t.unlockPickupCount}</color>";
 
         string desc = string.IsNullOrEmpty(t.description) ? "" : $"\n{t.description}";
         string stats = $"Type: {t.toolType}  |  DMG: {t.damage}  |  CD: {t.cooldown:F1}s";

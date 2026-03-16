@@ -17,12 +17,12 @@ MonoBehaviour:
   toolType: 1
   unlockScore: 5
   baseWeight: 97
-  damage: 5
+  damage: 8
   secondaryDamage: 5
   cooldown: 0.4
   attackParam: 4
   pierce: 1
-  toolIcon: {fileID: -347949138, guid: 9fabe08986df08f4ba3d8c28ffc01763, type: 3}
+  toolIcon: {fileID: 6934086728263231946, guid: c5eadd076c41cef4f9c950da3c94c7b8, type: 3}
   toolSprite: {fileID: -347949138, guid: 9fabe08986df08f4ba3d8c28ffc01763, type: 3}
   attackPrefab: {fileID: 0}
   attackAnimator: {fileID: 9100000, guid: 9161902b8f30cb245b79b4a648ceb75e, type: 2}
@@ -33,5 +33,7 @@ MonoBehaviour:
   secondaryAttackSFX: {fileID: 0}
   hitSFX: {fileID: 0}
   hitVFXPrefab: {fileID: 0}
-  hitTextPrefab: {fileID: 0}
-  hitTextSprites: []
+  hitTextPrefab: {fileID: 429878832413004069, guid: 1c495891e77ceb3449731dbe9cae7539, type: 3}
+  hitTextSprites:
+  - {fileID: -7575284744764469784, guid: 53238e97b964ac24681b89a82e6c6aff, type: 3}
+  - {fileID: -7956655330049976835, guid: cc72073dbd9ed7e4182d07679efa8715, type: 3}

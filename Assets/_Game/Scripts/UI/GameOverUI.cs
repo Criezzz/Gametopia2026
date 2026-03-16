@@ -60,6 +60,7 @@ public class GameOverUI : MonoBehaviour
         if (_mainMenuButton != null)
             _mainMenuButton.onClick.AddListener(OnMainMenuClicked);
 
+        DisableNonInteractiveTextRaycasts();
         SetPanelVisible(false);
     }
 
@@ -84,9 +85,7 @@ public class GameOverUI : MonoBehaviour
 
         Time.timeScale = 0f;
 
-        bool isArena = GameManager.Instance != null &&
-                       GameManager.Instance.CurrentMode != null &&
-                       GameManager.Instance.CurrentMode.modeType == GameModeType.Arena;
+        bool isArena = GameManager.IsArenaMode;
 
         // Toggle Solo vs Arena containers
         if (_gameOverTitle != null) _gameOverTitle.SetActive(!isArena);
@@ -230,6 +229,18 @@ public class GameOverUI : MonoBehaviour
         else
         {
             _panel.SetActive(visible);
+        }
+    }
+
+    private void DisableNonInteractiveTextRaycasts()
+    {
+        if (_panel == null) return;
+
+        var texts = _panel.GetComponentsInChildren<TextMeshProUGUI>(true);
+        for (int i = 0; i < texts.Length; i++)
+        {
+            if (texts[i] != null)
+                texts[i].raycastTarget = false;
         }
     }
 }

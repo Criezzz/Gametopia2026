@@ -33,6 +33,7 @@ public class PauseUI : MonoBehaviour
         if (_canvasGroup == null)
             _canvasGroup = _panel.AddComponent<CanvasGroup>();
 
+        DisableNonInteractiveTextRaycasts();
         SetPanelVisible(false);
     }
 
@@ -121,5 +122,16 @@ public class PauseUI : MonoBehaviour
             _panel.SetActive(visible);
         }
     }
-}
 
+    private void DisableNonInteractiveTextRaycasts()
+    {
+        if (_panel == null) return;
+
+        var texts = _panel.GetComponentsInChildren<TextMeshProUGUI>(true);
+        for (int i = 0; i < texts.Length; i++)
+        {
+            if (texts[i] != null)
+                texts[i].raycastTarget = false;
+        }
+    }
+}

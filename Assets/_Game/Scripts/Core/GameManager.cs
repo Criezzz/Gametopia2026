@@ -14,6 +14,8 @@ public enum GameState
 /// Singleton GameManager. Manages score, tool pool, unlocks, and game state.
 public class GameManager : MonoBehaviour
 {
+    private const string LegacyHighScoreKey = "HighScore";
+
     public static GameManager Instance { get; private set; }
 
     [Header("Current State")]
@@ -59,11 +61,11 @@ public class GameManager : MonoBehaviour
     public static bool IsTutorial { get; set; }
 
     /// <summary>
-    /// Maximum unlock score allowed during a tutorial run.
+    /// Maximum pickup threshold allowed during a tutorial run.
     /// Set by TutorialManager from its _maxUnlockTool ToolData asset.
-    /// Tools with unlockScore above this are never added to the pool.
+    /// Tools with unlockPickupCount above this are never added to the pool.
     /// </summary>
-    public static int TutorialUnlockCap { get; set; } = int.MaxValue;
+    public static int TutorialUnlockPickupCap { get; set; } = int.MaxValue;
 
     public string ActiveSceneName => IsTutorial ? SceneNames.Tutorial : ResolveSceneName();
     // Arena: per-player scores (index 0 = P1, index 1 = P2)
@@ -71,8 +73,23 @@ public class GameManager : MonoBehaviour
     public int GetArenaScore(int playerIndex) => _arenaScores[Mathf.Clamp(playerIndex, 0, 1)];
 
     [Header("Debug")]
-    [Tooltip("If true, unlocks all tools immediately ignoring the High Score requirement.")]
+    [Tooltip("If true, unlocks all tools and maps for testing.")]
     [SerializeField] private bool _devMode = false;
+    public static bool DevMode => Instance != null && Instance._devMode;
+
+    /// True when in Arena mode. Uses _currentMode when set; otherwise falls back to scene name
+    /// (so Arena works when running the scene directly without going through Main Menu).
+    public static bool IsArenaMode
+    {
+        get
+        {
+            if (Instance == null) return false;
+            if (Instance._currentMode != null && Instance._currentMode.modeType == GameModeType.Arena)
+                return true;
+            string scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+            return scene == SceneNames.Arena || scene == SceneNames.Arena_Map2;
+        }
+    }
 
     [Header("Tool Pool")]
     [SerializeField] private ToolData[] _allTools;
@@ -81,7 +98,14 @@ public class GameManager : MonoBehaviour
     private readonly HashSet<ToolData> _unlockedTools = new();
     private ToolData[] _playerTools = new ToolData[2];
     private bool[] _hasAwardedFirstPickup = new bool[2];
+    private bool[] _playerDead = new bool[2];
     public ToolData CurrentTool => _playerTools[0]; // Solo compat
+
+    public ToolData GetPlayerTool(int playerIndex)
+    {
+        int idx = Mathf.Clamp(playerIndex, 0, 1);
+        return _playerTools[idx];
+    }
 
     [Header("Toolbox")]
     [SerializeField] private Toolbox _toolboxPrefab;
@@ -92,7 +116,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private IntEventChannel _onScoreChanged;
     [SerializeField] private ToolDataEventChannel _onMilestoneReached;
     [SerializeField] private ToolDataEventChannel _onToolEquipped;
-    [SerializeField] private VoidEventChannel _onPlayerDied;
+    [SerializeField] private IntEventChannel _onPlayerDied;
     [SerializeField] private VoidEventChannel _onGameOver;
     [SerializeField] private VoidEventChannel _onGamePaused;
     [SerializeField] private VoidEventChannel _onGameRestart;
@@ -142,13 +166,13 @@ public class GameManager : MonoBehaviour
         }
 
         // Migrate legacy PlayerPrefs if present
-        int legacyScore = PlayerPrefs.GetInt("HighScore", 0);
+        int legacyScore = PlayerPrefs.GetInt(LegacyHighScoreKey, 0);
         if (legacyScore > HighScore)
         {
             HighScore = legacyScore;
             SaveManager.Data.highScore = legacyScore;
             SaveManager.Save();
-            PlayerPrefs.DeleteKey("HighScore");
+            PlayerPrefs.DeleteKey(LegacyHighScoreKey);
             PlayerPrefs.Save();
             Debug.Log($"[GameManager] Migrated legacy PlayerPrefs highScore: {legacyScore}");
         }
@@ -163,7 +187,7 @@ public class GameManager : MonoBehaviour
     private void OnEnable()
     {
         if (_onToolPickedUp != null) _onToolPickedUp.Register(HandleToolPickedUp);
-        if (_onPlayerDied != null) _onPlayerDied.Register(HandlePlayerDied);
+        if (_onPlayerDied != null) _onPlayerDied.Register(HandlePlayerDiedInt);
         if (_onGamePaused != null) _onGamePaused.Register(HandleGamePaused);
         if (_onGameRestart != null) _onGameRestart.Register(HandleGameRestart);
         if (_onEnemyKilled != null) _onEnemyKilled.Register(HandleEnemyKilled);
@@ -195,7 +219,7 @@ public class GameManager : MonoBehaviour
     private void OnDisable()
     {
         if (_onToolPickedUp != null) _onToolPickedUp.Unregister(HandleToolPickedUp);
-        if (_onPlayerDied != null) _onPlayerDied.Unregister(HandlePlayerDied);
+        if (_onPlayerDied != null) _onPlayerDied.Unregister(HandlePlayerDiedInt);
         if (_onGamePaused != null) _onGamePaused.Unregister(HandleGamePaused);
         if (_onGameRestart != null) _onGameRestart.Unregister(HandleGameRestart);
         if (_onEnemyKilled != null) _onEnemyKilled.Unregister(HandleEnemyKilled);
@@ -247,7 +271,7 @@ public class GameManager : MonoBehaviour
 
         // Backward compatibility with existing default gameplay scenes.
         return sceneName == SceneNames.Game || sceneName == SceneNames.Arena
-            || sceneName == SceneNames.Tutorial;
+            || sceneName == SceneNames.Arena_Map2 || sceneName == SceneNames.Tutorial;
     }
 
     public int GetCurrentMapHighScore()
@@ -281,6 +305,7 @@ public class GameManager : MonoBehaviour
         _unlockedTools.Clear();
         _hasAwardedFirstPickup = new bool[2];
         _playerTools = new ToolData[2];
+        _playerDead = new bool[2];
 
         UpdateUnlockedTools(false);
 
@@ -317,13 +342,17 @@ public class GameManager : MonoBehaviour
 
     private void UpdateUnlockedTools(bool raiseMilestoneEvent)
     {
-        int effectiveScore = IsTutorial ? _score : Mathf.Max(HighScore, _score);
+        int effectivePickupCount = GetEffectiveToolUnlockPickupCount();
+        if (_allTools == null) return;
+
         foreach (var tool in _allTools)
         {
-            if (IsTutorial && tool.unlockScore > TutorialUnlockCap)
+            if (tool == null) continue;
+
+            if (IsTutorial && tool.unlockPickupCount > TutorialUnlockPickupCap)
                 continue;
 
-            bool shouldUnlock = _devMode || (effectiveScore >= tool.unlockScore);
+            bool shouldUnlock = _devMode || (effectivePickupCount >= tool.unlockPickupCount);
             if (shouldUnlock && !_unlockedTools.Contains(tool))
             {
                 _unlockedTools.Add(tool);
@@ -339,6 +368,15 @@ public class GameManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    private int GetEffectiveToolUnlockPickupCount()
+    {
+        // Keep tutorial progression run-based as before.
+        if (IsTutorial)
+            return Mathf.Max(0, _score);
+
+        return Mathf.Max(0, SaveManager.Data.totalToolPickups);
     }
 
     public ToolData GetRandomTool()
@@ -363,7 +401,8 @@ public class GameManager : MonoBehaviour
 
     private void HandleToolPickedUp(int playerIndex)
     {
-        bool isArena = _currentMode != null && _currentMode.modeType == GameModeType.Arena;
+        bool isArenaMode = IsArenaMode;
+        int clampedPlayerIndex = Mathf.Clamp(playerIndex, 0, 1);
 
         if (IsTutorial)
         {
@@ -382,25 +421,21 @@ public class GameManager : MonoBehaviour
 
         _score++;
         SaveManager.Data.totalToolPickups++;
-        if (isArena)
-            _arenaScores[Mathf.Clamp(playerIndex, 0, 1)]++;
+        if (isArenaMode)
+            _arenaScores[clampedPlayerIndex]++;
 
-        bool mapHighScoreImproved = TryUpdateCurrentMapHighScore();
-        bool globalHighScoreImproved = false;
+        TryUpdateCurrentMapHighScore();
 
         if (_score > HighScore)
         {
             HighScore = _score;
             SaveManager.Data.highScore = HighScore;
-            globalHighScoreImproved = true;
-
-            UpdateUnlockedTools(true);
         }
 
-        if (mapHighScoreImproved || globalHighScoreImproved)
-            SaveManager.Save();
+        UpdateUnlockedTools(true);
+        SaveManager.Save();
 
-        _onScoreChanged?.Raise(isArena ? _arenaScores[playerIndex] : _score);
+        _onScoreChanged?.Raise(isArenaMode ? _arenaScores[clampedPlayerIndex] : _score);
     }
 
     /// Called by Toolbox to get the tool for a specific player.
@@ -423,8 +458,18 @@ public class GameManager : MonoBehaviour
         return tool;
     }
 
-    private void HandlePlayerDied()
+    private void HandlePlayerDiedInt(int playerIndex)
     {
+        bool isArena = IsArenaMode;
+
+        if (isArena)
+        {
+            int idx = Mathf.Clamp(playerIndex, 0, 1);
+            _playerDead[idx] = true;
+            if (!(_playerDead[0] && _playerDead[1]))
+                return;
+        }
+
         SetState(GameState.GameOver);
         Time.timeScale = 0f;
 
@@ -483,7 +528,7 @@ public class GameManager : MonoBehaviour
         else if (scene.name == SceneNames.MainMenu)
         {
             IsTutorial = false;
-            TutorialUnlockCap = int.MaxValue;
+            TutorialUnlockPickupCap = int.MaxValue;
             SetState(GameState.MainMenu);
         }
     }
@@ -538,11 +583,11 @@ public class GameManager : MonoBehaviour
         Debug.Log($"[GameManager] State changed to: {newState}");
     }
 
-    [ContextMenu("Reset High Score")]
+    [ContextMenu("Reset Progress")]
     public void ResetHighScore()
     {
         SaveManager.ResetAll();
         HighScore = 0;
-        Debug.Log("[GameManager] High score reset to 0. Restart the game to re-lock tools.");
+        Debug.Log("[GameManager] Save progress reset. Restart the game to re-lock tools.");
     }
 }

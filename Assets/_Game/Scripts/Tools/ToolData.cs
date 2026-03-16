@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// Enum for tool behavior type — determines how the tool attacks.
@@ -26,8 +27,9 @@ public class ToolData : ScriptableObject
     public ToolType toolType;
     
     [Header("Unlocks & Pool")]
-    [Tooltip("The High Score required to permanently unlock this tool.")]
-    public int unlockScore = 0;
+    [FormerlySerializedAs("unlockScore")]
+    [Tooltip("Total crate pickups required to permanently unlock this tool.")]
+    public int unlockPickupCount = 0;
     [Tooltip("The weight of this tool appearing in the random pool. Higher weight = more likely.")]
     public float baseWeight = 10f;
 

@@ -64,7 +64,7 @@ MonoBehaviour:
   _onScoreChanged: {fileID: 11400000, guid: 09f00aaf38d9afd4299d1f042c9198f4, type: 2}
   _onMilestoneReached: {fileID: 11400000, guid: fbd2a1f5a21f8a74bacede27f8c1caff, type: 2}
   _onToolEquipped: {fileID: 11400000, guid: 57dc5b8fd0a850741939c0c055c3fe51, type: 2}
-  _onPlayerDied: {fileID: 11400000, guid: 51eb91e2562ea544cb4b1adb91701478, type: 2}
+  _onPlayerDied: {fileID: 11400000, guid: a1b2c3d4e5f6789012345678abcdef01, type: 2}
   _onGameOver: {fileID: 11400000, guid: 54b7d0f4035e00545b9a26815018b99c, type: 2}
   _onGamePaused: {fileID: 11400000, guid: 472d2e91bc6226d4eb61558c38b6bc8b, type: 2}
   _onGameRestart: {fileID: 11400000, guid: 2d94cfb9b9062ff46a8cab33690c6c06, type: 2}
@@ -85,6 +85,6 @@ MonoBehaviour:
   _sortingLayerName: DeathDrop
   _popUpSpeed: 6
   _horizontalDriftRange: 1.5
-  _gravity: 25
+  _gravity: 30
   _rotateSpeed: 180
   _destroyY: -15

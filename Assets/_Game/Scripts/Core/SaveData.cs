@@ -27,4 +27,8 @@ public class SaveData
     public int resolutionWidth = 0;
     public int resolutionHeight = 0;
     public int fullscreenMode = -1; // -1 = use default
+
+    // Audio (0-1 linear, applied to mixer as dB)
+    public float bgmVolume = 0.75f;
+    public float sfxVolume = 0.75f;
 }

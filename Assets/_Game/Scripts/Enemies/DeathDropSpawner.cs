@@ -53,6 +53,6 @@ public class DeathDropSpawner : MonoBehaviour
         Vector2 initialVelocity = new Vector2(driftX, _popUpSpeed);
 
         var drop = go.AddComponent<DeathDropFall>();
-        drop.Initialize(initialVelocity, _gravity, _destroyY, _rotateSpeed);
+        drop.Initialize(initialVelocity, _gravity, _destroyY, _rotateSpeed, data.onComplete);
     }
 }

@@ -11,6 +11,8 @@ public class BGMManager : MonoBehaviour
     public static BGMManager Instance { get; private set; }
 
     [Header("Audio Mixer")]
+    [Tooltip("Assign the MainMixer (needed to apply saved volume at startup).")]
+    [SerializeField] private AudioMixer _audioMixer;
     [Tooltip("Assign the BGM mixer group from the MainMixer.")]
     [SerializeField] private AudioMixerGroup _bgmMixerGroup;
 
@@ -48,6 +50,21 @@ public class BGMManager : MonoBehaviour
             _sourceA.outputAudioMixerGroup = _bgmMixerGroup;
             _sourceB.outputAudioMixerGroup = _bgmMixerGroup;
         }
+
+        // Apply saved volume at startup (before BGM plays) so BGM/SFX respect SaveData
+        if (_audioMixer != null)
+        {
+            var data = SaveManager.Data;
+            ApplyVolume("BGMVolume", data.bgmVolume);
+            ApplyVolume("SFXVolume", data.sfxVolume);
+        }
+    }
+
+    private void ApplyVolume(string paramName, float linearValue)
+    {
+        if (_audioMixer == null) return;
+        float dB = linearValue > 0.0001f ? Mathf.Log10(linearValue) * 20f : -80f;
+        _audioMixer.SetFloat(paramName, dB);
     }
 
     private void OnEnable()

@@ -14,17 +14,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   enemyName: Elite
   moveType: 2
-  maxHP: 12
-  moveSpeed: 2.5
+  maxHP: 13
+  moveSpeed: 3
   contactDamage: 1
-  gravityScale: 3
-  firstSpawnDelay: 15
-  spawnInterval: 10
-  difficultyTickInterval: 15
-  intervalReductionPerTick: 0.3
-  minSpawnInterval: 5
-  respawnSpeedMultiplier: 1.5
+  gravityScale: 4
+  firstSpawnDelay: 7
+  spawnInterval: 9
+  difficultyTickInterval: 10
+  intervalReductionPerTick: 0.5
+  minSpawnInterval: 3
+  respawnSpeedMultiplier: 2
   enemySprite: {fileID: 0}
   angrySprite: {fileID: 0}
   animatorController: {fileID: 9100000, guid: 64a66c954d8c6b248993b4e17d0c253f, type: 2}
+  spawnVFXPrefab: {fileID: 0}
+  deathVFXPrefab: {fileID: 0}
   angryAnimatorController: {fileID: 0}
