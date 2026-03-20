@@ -21,7 +21,7 @@ public class FlyerEnemy : BaseEnemy
     [Tooltip("How much of the bounce reflection to keep (0 = ignore bounce, 1 = full reflect)")]
     [Range(0f, 1f)]
     [SerializeField] private float _bounceStrength = 0.4f;
-
+   
     private Vector2 _moveDirection;
     private float _retargetTimer;
     private Transform _playerTarget;

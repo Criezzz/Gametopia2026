@@ -30,10 +30,10 @@ public class ChainsawTool : BaseTool
         if (!_isHolding)
         {
             _isHolding = true;
-            PlayAttackSFX();
             OnRequestStartHold?.Invoke();
         }
 
+        PlayAttackSFX();
         _isAttacking = true;
 
         Vector2 origin = GetAttackOrigin();
@@ -73,15 +73,5 @@ public class ChainsawTool : BaseTool
     {
         _isHolding = false;
         base.OnUnequip();
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = new Color(1f, 0f, 0f, 0.5f); // Red half-transparent
-        Vector2 origin = GetAttackOrigin();
-        Vector2 dir = GetAttackDirection();
-        Vector2 boxSize = new Vector2(_range, 0.8f);
-        Vector2 boxCenter = origin + dir * (_range * 0.5f);
-        Gizmos.DrawWireCube(boxCenter, boxSize);
     }
 }

@@ -210,7 +210,14 @@ public class PlayerToolHandler : MonoBehaviour
         }
 
         if (_weaponSpriteRenderer != null)
+        {
             _weaponSpriteRenderer.flipX = facing < 0;
+            // Hide renderer when animator leaves sprite null to avoid a visible white box.
+            if (_weaponSpriteRenderer.sprite == null)
+                _weaponSpriteRenderer.enabled = false;
+            else if (_currentToolData != null)
+                _weaponSpriteRenderer.enabled = true;
+        }
     }
 
     private void TriggerWeaponAttackAnimation()

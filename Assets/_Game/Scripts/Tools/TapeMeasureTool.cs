@@ -10,7 +10,7 @@ public class TapeMeasureTool : BaseTool
 {
     [Header("Tape Measure Settings")]
     [SerializeField] private LayerMask _enemyLayer;
-    [SerializeField] private float _extendSpeed = 16f;
+    [SerializeField] private float _extendSpeed = 20f;
 
     private bool _isExtending;
     private bool _isRetracting;
@@ -93,11 +93,10 @@ public class TapeMeasureTool : BaseTool
     {
         Vector2 origin = (Vector2)transform.position;
         Vector2 dir = GetAttackDirection();
-        LayerMask enemyMask = ResolveEnemyLayerMask(_enemyLayer);
 
         // Thin box along the tape
         RaycastHit2D[] hits = Physics2D.BoxCastAll(
-            origin, new Vector2(0.2f, 0.5f), 0f, dir, _currentLength, enemyMask);
+            origin, new Vector2(0.2f, 0.5f), 0f, dir, _currentLength, _enemyLayer);
 
         foreach (var hit in hits)
         {
@@ -105,7 +104,7 @@ public class TapeMeasureTool : BaseTool
             if (!hitSet.Contains(id))
             {
                 hitSet.Add(id);
-                var enemy = hit.collider.GetComponentInParent<BaseEnemy>();
+                var enemy = hit.collider.GetComponent<BaseEnemy>();
                 if (enemy != null)
                 {
                     enemy.TakeDamage(damageToApply, _toolData);
@@ -121,4 +120,6 @@ public class TapeMeasureTool : BaseTool
         _isRetracting = false;
         _currentLength = 0f;
     }
+
+    
 }

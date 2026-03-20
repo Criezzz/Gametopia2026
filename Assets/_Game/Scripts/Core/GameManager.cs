@@ -523,14 +523,28 @@ public class GameManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if (IsGameplayScene(scene.name) && _currentState != GameState.Playing)
-            StartGame();
-        else if (scene.name == SceneNames.MainMenu)
+        if (scene.name == SceneNames.MainMenu)
         {
             IsTutorial = false;
             TutorialUnlockPickupCap = int.MaxValue;
             SetState(GameState.MainMenu);
+            return;
         }
+
+        // Sync IsTutorial based on the actual scene being loaded so that
+        // ActiveSceneName always returns the correct restart target.
+        if (scene.name == SceneNames.Tutorial)
+        {
+            IsTutorial = true;
+        }
+        else if (IsGameplayScene(scene.name))
+        {
+            IsTutorial = false;
+            TutorialUnlockPickupCap = int.MaxValue;
+        }
+
+        if (IsGameplayScene(scene.name) && _currentState != GameState.Playing)
+            StartGame();
     }
 
     private void DevEquipToolByIndex(int index)

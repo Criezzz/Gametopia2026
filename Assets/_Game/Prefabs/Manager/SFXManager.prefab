@@ -143,5 +143,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SFXManager
   _sfxMixerGroup: {fileID: -4963903993004456131, guid: 0ec525a2b606e0644835829253fab73a, type: 2}
-  _pickupSFX: {fileID: 0}
-  _milestoneSFX: {fileID: 0}
+  _pickupSFX: {fileID: 8300000, guid: 657480996d15ea449a5c6fbb7d03944c, type: 3}
+  _milestoneSFX: {fileID: 8300000, guid: d6f862b74efd3be4591dd7ec01571c24, type: 3}

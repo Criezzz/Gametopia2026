@@ -31,12 +31,24 @@ public class SceneLoader : MonoBehaviour
     {
         if (_onSceneTransition != null)
             _onSceneTransition.Register(LoadScene);
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     private void OnDisable()
     {
         if (_onSceneTransition != null)
             _onSceneTransition.Unregister(LoadScene);
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Reset the loading guard whenever a scene finishes loading.
+        // This prevents _isLoading from staying true if a synchronous
+        // SceneManager.LoadScene call was made by another script
+        // (e.g. restart) while no async load was in progress, or if
+        // an async coroutine was interrupted.
+        _isLoading = false;
     }
 
     public void LoadScene(string sceneName)

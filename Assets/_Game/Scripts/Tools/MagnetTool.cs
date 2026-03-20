@@ -13,9 +13,12 @@ public class MagnetTool : BaseTool
     [SerializeField] private float _beamLength = 50f;
     [SerializeField] private float _verticalOffset = 0.5f;
 
+    private bool _isHolding;
+
     public override void Initialize(ToolData data, PlayerController player)
     {
         base.Initialize(data, player);
+        _isHolding = false;
 
         if (data != null && data.attackParam > 0f)
             _beamLength = data.attackParam;
@@ -32,8 +35,14 @@ public class MagnetTool : BaseTool
     public override void Attack()
     {
         if (!CanAttack()) return;
-        PlayAttackSFX();
 
+        if (!_isHolding)
+        {
+            _isHolding = true;
+            OnRequestStartHold?.Invoke();
+        }
+
+        PlayAttackSFX();
         _isAttacking = true;
 
         Vector2 origin = GetAttackOrigin();
@@ -47,7 +56,7 @@ public class MagnetTool : BaseTool
 
         // Raycast forward — hits ALL enemies (pierce) using BoxCast for volume
         RaycastHit2D[] hits = Physics2D.BoxCastAll(
-            boxCenter, boxSize, 0f, 
+            boxCenter, boxSize, 0f,
             dir, _beamLength, enemyMask);
 
         foreach (var hit in hits)
@@ -62,17 +71,19 @@ public class MagnetTool : BaseTool
         StartCooldown();
     }
 
-    private void OnDrawGizmosSelected()
+    public override void StopAttack()
     {
-        Gizmos.color = new Color(0.5f, 0f, 1f, 0.5f); // Purple half-transparent
-        Vector2 origin = GetAttackOrigin();
-        Vector2 dir = GetAttackDirection();
-        Vector2 boxCenter = origin + new Vector2(0f, _verticalOffset);
-        Vector2 boxSize = new Vector2(_beamWidth, _beamHeight);
-        
-        float drawLength = _beamLength;
-        Vector2 endCenter = boxCenter + dir * drawLength;
-        Gizmos.DrawLine(boxCenter, endCenter);
-        Gizmos.DrawWireCube(boxCenter + dir * (drawLength * 0.5f), new Vector3(drawLength, boxSize.y, 1f));
+        if (_isHolding)
+        {
+            _isHolding = false;
+            OnRequestStopHold?.Invoke();
+        }
+        base.StopAttack();
+    }
+
+    public override void OnUnequip()
+    {
+        _isHolding = false;
+        base.OnUnequip();
     }
 }

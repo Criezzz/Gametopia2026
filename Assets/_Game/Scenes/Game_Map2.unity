@@ -200,7 +200,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -10
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -166703347675633482, guid: 3c318237df92fc749a978c2d59f7d309, type: 3}
+  m_Sprite: {fileID: 21300000, guid: d557a7f745c179146a7f6e171d7020d6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -1683,7 +1683,8 @@ PrefabInstance:
       value: 512
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 7778970583310419231, guid: e93221ecf18706c4996371c5c5ae929f, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e93221ecf18706c4996371c5c5ae929f, type: 3}
@@ -1758,7 +1759,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1913480780439782038, guid: 85ebf40fcac5f394492bef6b4e76213e, type: 3}
       propertyPath: _devMode
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1913480780439782038, guid: 85ebf40fcac5f394492bef6b4e76213e, type: 3}
       propertyPath: _currentMode

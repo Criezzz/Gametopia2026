@@ -29,7 +29,7 @@ MonoBehaviour:
   weaponHoldDistance: 0.5
   weaponYOffset: 0
   behaviorConfig: {fileID: 0}
-  attackSFX: {fileID: 8300000, guid: 866c125cab0efc94caa2688442007680, type: 3}
+  attackSFX: {fileID: 8300000, guid: 3acf3a16ffe391547aabf9c1320a1c03, type: 3}
   secondaryAttackSFX: {fileID: 0}
   hitSFX: {fileID: 0}
   hitVFXPrefab: {fileID: 0}

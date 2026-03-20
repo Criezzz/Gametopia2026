@@ -7,17 +7,15 @@ using UnityEngine;
 public class HitTextPopup : MonoBehaviour
 {
     [Header("Motion")]
-    [SerializeField] private float _launchSpeed = 6f;
+    [SerializeField] private float _launchSpeed = 15f;
     [SerializeField] private float _gravity = 8f;
     [SerializeField] private float _minAngle = 30f;
     [SerializeField] private float _maxAngle = 150f;
 
     [Header("Scale Punch")]
-    [SerializeField] private float _punchScale = 1.5f;
-    [SerializeField] private float _settleScale = 0.7f;
-    [SerializeField] private float _punchDuration = 0.2f;
-    [Tooltip("Global scale multiplier for this popup.")]
-    [SerializeField] private float _globalScaleMultiplier = 0.6f;
+    [SerializeField] private float _punchScale = 1.2f;
+    [SerializeField] private float _settleScale = 0.5f;
+    [SerializeField] private float _punchDuration = 0.1f;
 
     [Header("Color Cycle")]
     [SerializeField] private Color[] _colors = new[]
@@ -30,8 +28,8 @@ public class HitTextPopup : MonoBehaviour
     [SerializeField] private float _colorInterval = 0.12f;
 
     [Header("Lifetime")]
-    [SerializeField] private float _lifetime = 0.5f;
-    [SerializeField] private float _fadeStartRatio = 0.6f;
+    [SerializeField] private float _lifetime = 0.3f;
+    [SerializeField] private float _fadeStartRatio = 0.7f;
 
     [Header("Rendering")]
     [Tooltip("Sorting layer name for the popup sprite (must exist in project)")]
@@ -65,7 +63,7 @@ public class HitTextPopup : MonoBehaviour
         _velocity = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * _launchSpeed;
 
         // Start at punch scale
-        transform.localScale = Vector3.one * (_punchScale * _globalScaleMultiplier);
+        transform.localScale = Vector3.one * _punchScale;
     }
 
     private void Update()
@@ -90,7 +88,7 @@ public class HitTextPopup : MonoBehaviour
             scale = Mathf.Lerp(_punchScale, _settleScale * 0.85f, scaleT * 2f);
         else
             scale = Mathf.Lerp(_settleScale * 0.85f, _settleScale, (scaleT - 0.5f) * 2f);
-        transform.localScale = Vector3.one * (scale * _globalScaleMultiplier);
+        transform.localScale = Vector3.one * scale;
 
         // --- Color cycle ---
         _colorTimer += Time.deltaTime;

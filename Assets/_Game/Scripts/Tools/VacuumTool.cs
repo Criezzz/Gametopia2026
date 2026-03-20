@@ -244,14 +244,4 @@ public class VacuumTool : BaseTool
                 t.localScale = new Vector3(scaleX, s.y, s.z);
         }
     }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = new Color(0f, 1f, 0f, 0.5f); // Green half-transparent
-        Vector2 pos = transform.position;
-        Vector2 dir = GetAttackDirection();
-        Vector2 boxSize = new Vector2(_suckRange, 1f);
-        Vector2 boxCenter = pos + dir * (_suckRange * 0.5f);
-        Gizmos.DrawWireCube(boxCenter, boxSize);
-    }
 }

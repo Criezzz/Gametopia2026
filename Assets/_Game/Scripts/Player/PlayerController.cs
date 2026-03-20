@@ -323,27 +323,5 @@ public class PlayerController : MonoBehaviour
         for (int i = 0; i < root.childCount; i++)
             SetLayerRecursively(root.GetChild(i), layer);
     }
-
-#if UNITY_EDITOR
-    private void OnDrawGizmos()
-    {
-        if (_boxCollider == null) _boxCollider = GetComponent<BoxCollider2D>();
-        if (_boxCollider != null)
-        {
-            Gizmos.color = Color.green;
-            Vector2 center = (Vector2)transform.position + _boxCollider.offset;
-            Vector2 size = _boxCollider.size;
-            Gizmos.DrawWireCube(center, size);
-        }
-
-        var sr = GetComponentInChildren<SpriteRenderer>();
-        if (sr != null)
-        {
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireCube(sr.bounds.center, sr.bounds.size);
-        }
-    }
-#endif
-
 }
 

@@ -15,7 +15,7 @@ MonoBehaviour:
   toolName: Blowtorch
   description: Continuous flame, 3 unit range.
   toolType: 3
-  unlockScore: 25
+  unlockPickupCount: 25
   baseWeight: 95
   damage: 2
   secondaryDamage: 0
@@ -29,7 +29,7 @@ MonoBehaviour:
   weaponHoldDistance: 0.5
   weaponYOffset: 0
   behaviorConfig: {fileID: 0}
-  attackSFX: {fileID: 8300000, guid: c64d646821861ce4689d91adcbb40457, type: 3}
+  attackSFX: {fileID: 8300000, guid: 591e0f90de7630647b024836461d4ca9, type: 3}
   secondaryAttackSFX: {fileID: 0}
   hitSFX: {fileID: 0}
   hitVFXPrefab: {fileID: 4292059699018276470, guid: 150c405ef926aca4d8bcf16f402425fc, type: 3}

@@ -44,6 +44,7 @@ public class TutorialManager : MonoBehaviour
     [SerializeField] private IntEventChannel _onToolPickedUp;
     [SerializeField] private VoidEventChannel _onEnemyKilled;
     [SerializeField] private EnemyFallChannel _onEnemyFell;
+    [SerializeField] private VoidEventChannel _onGameOver;
 
     [Header("Timing")]
     [SerializeField] private float _moveDetectDuration = 0.3f;
@@ -93,6 +94,7 @@ public class TutorialManager : MonoBehaviour
     private float _spawnXLeft;
     private float _spawnXRight;
     private float _spawnYOffset;
+    private Coroutine _tutorialCoroutine;
 
     private void Start()
     {
@@ -101,7 +103,7 @@ public class TutorialManager : MonoBehaviour
         DisableEnemySpawner();
         DestroyAllToolboxes();
 
-        StartCoroutine(RunTutorial());
+        _tutorialCoroutine = StartCoroutine(RunTutorial());
     }
 
     private void ApplyTutorialUnlockPickupCap()
@@ -115,6 +117,7 @@ public class TutorialManager : MonoBehaviour
         if (_onToolPickedUp != null) _onToolPickedUp.Register(OnCratePickedUp);
         if (_onEnemyKilled != null) _onEnemyKilled.Register(OnEnemyKilled);
         if (_onEnemyFell != null) _onEnemyFell.Register(HandleEnemyFell);
+        if (_onGameOver != null) _onGameOver.Register(OnGameOver);
     }
 
     private void OnDisable()
@@ -122,6 +125,19 @@ public class TutorialManager : MonoBehaviour
         if (_onToolPickedUp != null) _onToolPickedUp.Unregister(OnCratePickedUp);
         if (_onEnemyKilled != null) _onEnemyKilled.Unregister(OnEnemyKilled);
         if (_onEnemyFell != null) _onEnemyFell.Unregister(HandleEnemyFell);
+        if (_onGameOver != null) _onGameOver.Unregister(OnGameOver);
+    }
+
+    private void OnGameOver()
+    {
+        if (_tutorialCoroutine != null)
+        {
+            StopCoroutine(_tutorialCoroutine);
+            _tutorialCoroutine = null;
+        }
+
+        if (_tutorialUI != null)
+            _tutorialUI.HideMessage();
     }
 
     // ─────────────────────── Initialization ───────────────────────
@@ -231,7 +247,7 @@ public class TutorialManager : MonoBehaviour
 
         ShowText(_movementCompleteText);
         yield return new WaitForSeconds(1.5f);
-        _tutorialUI.HideMessage();
+        if (_tutorialUI != null) _tutorialUI.HideMessage();
     }
 
     private IEnumerator WaitForMoveInput(float direction)
@@ -331,7 +347,7 @@ public class TutorialManager : MonoBehaviour
         DestroyAllToolboxes();
         ShowText(_cratePickedUpText);
         yield return new WaitForSeconds(4f);
-        _tutorialUI.HideMessage();
+        if (_tutorialUI != null) _tutorialUI.HideMessage();
     }
 
     private void OnCratePickedUp(int _)
@@ -356,7 +372,7 @@ public class TutorialManager : MonoBehaviour
 
         ShowText(_enemyDefeatedText);
         yield return new WaitForSeconds(1.5f);
-        _tutorialUI.HideMessage();
+        if (_tutorialUI != null) _tutorialUI.HideMessage();
     }
 
     private void SpawnWalkerEnemy()

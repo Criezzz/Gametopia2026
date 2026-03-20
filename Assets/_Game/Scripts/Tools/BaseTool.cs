@@ -38,13 +38,13 @@ public abstract class BaseTool : MonoBehaviour
     protected void PlayAttackSFX()
     {
         if (_toolData != null && _toolData.attackSFX != null && SFXManager.Instance != null)
-            SFXManager.Instance.Play(_toolData.attackSFX);
+            SFXManager.Instance.PlayToolSFX(_toolData.attackSFX);
     }
 
     protected void PlaySecondaryAttackSFX()
     {
         if (_toolData != null && _toolData.secondaryAttackSFX != null && SFXManager.Instance != null)
-            SFXManager.Instance.Play(_toolData.secondaryAttackSFX);
+            SFXManager.Instance.PlayToolSFX(_toolData.secondaryAttackSFX);
     }
 
     public virtual void StopAttack()
@@ -55,7 +55,7 @@ public abstract class BaseTool : MonoBehaviour
     public virtual void OnUnequip()
     {
         StopAttack();
-        SFXManager.Instance?.StopAll();
+        SFXManager.Instance?.StopToolSFX();
         OnRequestSecondaryAnimation = null;
         OnRequestPrimaryAnimation = null;
         OnRequestStartHold = null;

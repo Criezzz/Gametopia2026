@@ -38,15 +38,4 @@ public class HammerTool : BaseTool
         StartCooldown();
         Debug.Log($"[Hammer] Swing! Hit {hits.Length} enemies");
     }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = new Color(1f, 1f, 0f, 0.5f); // Yellow half-transparent
-        Vector2 origin = GetAttackOrigin();
-        Vector2 dir = GetAttackDirection();
-        float range = _toolData != null ? _toolData.attackParam : 2f;
-        Vector2 boxSize = new Vector2(range, 1f);
-        Vector2 boxCenter = origin + dir * (range * 0.5f);
-        Gizmos.DrawWireCube(boxCenter, boxSize);
-    }
 }

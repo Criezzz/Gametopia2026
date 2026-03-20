@@ -190,10 +190,14 @@ public class GameOverUI : MonoBehaviour
         if (_onGameRestart != null && _onGameRestart.HasListeners)
             _onGameRestart.Raise();
 
-        string sceneToLoad = GameManager.Instance != null 
-            ? GameManager.Instance.ActiveSceneName 
+        string sceneToLoad = GameManager.Instance != null
+            ? GameManager.Instance.ActiveSceneName
             : SceneManager.GetActiveScene().name;
-        SceneManager.LoadScene(sceneToLoad);
+
+        if (_onLoadScene != null && _onLoadScene.HasListeners)
+            _onLoadScene.Raise(sceneToLoad);
+        else
+            SceneManager.LoadScene(sceneToLoad);
     }
 
     private void DoMainMenu()

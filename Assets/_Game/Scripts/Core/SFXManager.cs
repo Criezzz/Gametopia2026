@@ -2,12 +2,9 @@ using UnityEngine;
 using UnityEngine.Audio;
 
 /// <summary>
-/// Singleton SFX manager. Plays one-shot sound effects via a shared AudioSource.
-/// Attach to a persistent GameObject in the scene alongside an AudioSource.
-///
-/// Usage:
-///   SFXManager.Instance.Play(clip);
-///   SFXManager.Instance.Play(clip, 0.8f);  // custom volume
+/// Singleton SFX manager with two AudioSources:
+///   _audioSource  – global one-shots (pickup, milestone, etc.) – never interrupted.
+///   _toolSource   – tool loop / attack SFX – stopped on tool switch via StopToolSFX().
 /// </summary>
 [RequireComponent(typeof(AudioSource))]
 public class SFXManager : MonoBehaviour
@@ -28,6 +25,7 @@ public class SFXManager : MonoBehaviour
     public AudioClip MilestoneSFX => _milestoneSFX;
 
     private AudioSource _audioSource;
+    private AudioSource _toolSource;
 
     private void Awake()
     {
@@ -40,34 +38,55 @@ public class SFXManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         _audioSource = GetComponent<AudioSource>();
 
+        _toolSource = gameObject.AddComponent<AudioSource>();
+        _toolSource.playOnAwake = false;
+
         if (_sfxMixerGroup != null)
+        {
             _audioSource.outputAudioMixerGroup = _sfxMixerGroup;
+            _toolSource.outputAudioMixerGroup = _sfxMixerGroup;
+        }
     }
 
-    /// <summary>
-    /// Play a one-shot clip at default volume.
-    /// </summary>
     public void Play(AudioClip clip)
     {
         if (clip == null || _audioSource == null) return;
         _audioSource.PlayOneShot(clip);
     }
 
-    /// <summary>
-    /// Play a one-shot clip at a specific volume (0-1).
-    /// </summary>
     public void Play(AudioClip clip, float volume)
     {
         if (clip == null || _audioSource == null) return;
         _audioSource.PlayOneShot(clip, volume);
     }
 
+    public void PlayToolSFX(AudioClip clip)
+    {
+        if (clip == null || _toolSource == null) return;
+        _toolSource.PlayOneShot(clip);
+    }
+
+    public void PlayToolSFX(AudioClip clip, float volume)
+    {
+        if (clip == null || _toolSource == null) return;
+        _toolSource.PlayOneShot(clip, volume);
+    }
+
     /// <summary>
-    /// Stop all currently playing SFX immediately (e.g. on tool switch).
+    /// Stop tool SFX only. Global one-shots (pickup, milestone) are unaffected.
+    /// </summary>
+    public void StopToolSFX()
+    {
+        if (_toolSource == null) return;
+        _toolSource.Stop();
+    }
+
+    /// <summary>
+    /// Stop everything (both sources). Use sparingly.
     /// </summary>
     public void StopAll()
     {
-        if (_audioSource == null) return;
-        _audioSource.Stop();
+        if (_audioSource != null) _audioSource.Stop();
+        if (_toolSource != null) _toolSource.Stop();
     }
 }

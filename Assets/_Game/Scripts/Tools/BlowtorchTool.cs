@@ -30,10 +30,10 @@ public class BlowtorchTool : BaseTool
         if (!_isHolding)
         {
             _isHolding = true;
-            PlayAttackSFX();
             OnRequestStartHold?.Invoke();
         }
 
+        PlayAttackSFX();
         _isAttacking = true;
 
         Vector2 origin = GetAttackOrigin();
@@ -74,15 +74,5 @@ public class BlowtorchTool : BaseTool
     {
         _isHolding = false;
         base.OnUnequip();
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = new Color(1f, 0.5f, 0f, 0.5f); // Orange half-transparent
-        Vector2 origin = GetAttackOrigin();
-        Vector2 dir = GetAttackDirection();
-        Vector2 boxSize = new Vector2(_range, 2.0f);
-        Vector2 boxCenter = origin + dir * (_range * 0.5f) + new Vector2(0f, 0.5f);
-        Gizmos.DrawWireCube(boxCenter, boxSize);
     }
 }

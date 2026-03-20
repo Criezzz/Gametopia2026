@@ -37,11 +37,11 @@ MonoBehaviour:
   - xMin: 6.48
     xMax: 8.529
     y: -3.49
-  - xMin: 3.11
-    xMax: -1.72
+  - xMin: -3.11
+    xMax: -1.5
     y: -4.25
-  - xMin: 3.11
-    xMax: -1.72
+  - xMin: 1.72
+    xMax: 3.11
     y: -4.25
   - xMin: -0.49
     xMax: 0.49
