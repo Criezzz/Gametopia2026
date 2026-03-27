@@ -41,10 +41,13 @@ public class PlayerController : MonoBehaviour
     // State
     private float _moveInput;
     private bool _isGrounded;
-    private bool _jumpRequested;
+    private bool _isPhysicallyGrounded;
+    private bool _jumpConsumedUntilGrounded;
     private bool _jumpCut;
     private float _velocityY;
     private float _jumpCooldownTimer;
+    private float _coyoteTimer;
+    private float _jumpBufferTimer;
     private int _facingDirection = 1; // 1 = right, -1 = left
     public int FacingDirection => _facingDirection;
 
@@ -53,6 +56,9 @@ public class PlayerController : MonoBehaviour
     private float _initialJumpVelocity;
 
     private const float CEILING_CHECK_DISTANCE = 0.05f;
+    private const float DEFAULT_COYOTE_TIME = 0.10f;
+    private const float DEFAULT_JUMP_BUFFER_TIME = 0.10f;
+    private const float JUMP_REPEAT_COOLDOWN = 0.15f;
     private Collider2D[] _cachedColliders;
 
     private void Awake()
@@ -99,10 +105,17 @@ public class PlayerController : MonoBehaviour
         _moveInput = _inputHandler.MoveInput;
 
         // Jump request (consumed in FixedUpdate)
-        // JumpPressed = tap; JumpHeld = hold for bunny hop (auto-jump on landing)
+        // JumpPressed = tap; JumpHeld only refreshes buffer while physically grounded.
         if (_jumpCooldownTimer > 0f) _jumpCooldownTimer -= Time.deltaTime;
-        if ((_inputHandler.JumpPressed || _inputHandler.JumpHeld) && _isGrounded && _jumpCooldownTimer <= 0f)
-            _jumpRequested = true;
+        if (_jumpBufferTimer > 0f) _jumpBufferTimer -= Time.deltaTime;
+        if (_inputHandler.JumpPressed)
+        {
+            _jumpBufferTimer = GetJumpBufferTime();
+        }
+        else if (_inputHandler.JumpHeld && _isPhysicallyGrounded)
+        {
+            _jumpBufferTimer = GetJumpBufferTime();
+        }
 
         // Variable jump: releasing early cuts upward velocity
         if (_inputHandler.JumpReleased && _velocityY > 0f && !_isGrounded)
@@ -126,26 +139,25 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         GroundCheck();
+        _isPhysicallyGrounded = IsPhysicallyOnGround();
+
+        // Reset jump-consumed only after a real landing (not while still rising at jump start).
+        if (_isPhysicallyGrounded && _velocityY <= 0f)
+            _jumpConsumedUntilGrounded = false;
+
+        UpdateCoyoteTimer();
 
         // Horizontal
         float moveSpeed = _data != null ? _data.moveSpeed : 6f;
         float targetVelX = _moveInput * moveSpeed;
 
         // --- Jump start ---
-        if (_jumpRequested)
+        if (!_jumpConsumedUntilGrounded
+            && _jumpBufferTimer > 0f
+            && _coyoteTimer > 0f
+            && _jumpCooldownTimer <= 0f)
         {
-            _velocityY = _initialJumpVelocity;
-            _jumpCut = false;
-            _jumpRequested = false;
-            _jumpCooldownTimer = 0.15f;
-
-            // Jump VFX
-            if (_jumpVFXPrefab != null)
-                VFXSpawner.Spawn(_jumpVFXPrefab, transform.position, _jumpVFXPrefab.transform.rotation);
-
-            // Jump SFX
-            if (_data != null && _data.jumpSFX != null && SFXManager.Instance != null)
-                SFXManager.Instance.Play(_data.jumpSFX);
+            StartJump();
         }
 
         // --- Jump cut (variable height) ---
@@ -175,7 +187,7 @@ public class PlayerController : MonoBehaviour
             _velocityY = 0f;
 
         // Ground snap — only when physically resting on ground (not just raycast)
-        if (_velocityY < 0f && IsPhysicallyOnGround())
+        if (_velocityY < 0f && _isPhysicallyGrounded)
             _velocityY = 0f;
 
         _rb.linearVelocity = new Vector2(targetVelX, _velocityY);
@@ -201,6 +213,36 @@ public class PlayerController : MonoBehaviour
         RaycastHit2D rightHit = Physics2D.Raycast(center + Vector2.right * sideOffset, Vector2.down, probeDistance, layer);
 
         _isGrounded = IsGroundHit(centerHit) || IsGroundHit(leftHit) || IsGroundHit(rightHit);
+    }
+
+    private void UpdateCoyoteTimer()
+    {
+        if (_isPhysicallyGrounded)
+        {
+            _coyoteTimer = GetCoyoteTime();
+            return;
+        }
+
+        if (_coyoteTimer > 0f)
+            _coyoteTimer -= Time.fixedDeltaTime;
+    }
+
+    private void StartJump()
+    {
+        _velocityY = _initialJumpVelocity;
+        _jumpCut = false;
+        _jumpConsumedUntilGrounded = true;
+        _coyoteTimer = 0f;
+        _jumpBufferTimer = 0f;
+        _jumpCooldownTimer = JUMP_REPEAT_COOLDOWN;
+
+        // Jump VFX
+        if (_jumpVFXPrefab != null)
+            VFXSpawner.Spawn(_jumpVFXPrefab, transform.position, _jumpVFXPrefab.transform.rotation);
+
+        // Jump SFX
+        if (_data != null && _data.jumpSFX != null && SFXManager.Instance != null)
+            SFXManager.Instance.Play(_data.jumpSFX);
     }
 
     public Vector2 GetAimDirection()
@@ -229,6 +271,20 @@ public class PlayerController : MonoBehaviour
             return 1 << groundLayer;
 
         return ~0;
+    }
+
+    private float GetCoyoteTime()
+    {
+        if (_data != null)
+            return Mathf.Max(0f, _data.coyoteTime);
+        return DEFAULT_COYOTE_TIME;
+    }
+
+    private float GetJumpBufferTime()
+    {
+        if (_data != null)
+            return Mathf.Max(0f, _data.jumpBufferTime);
+        return DEFAULT_JUMP_BUFFER_TIME;
     }
 
     private bool IsGroundHit(RaycastHit2D hit)

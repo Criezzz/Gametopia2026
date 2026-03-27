@@ -24,6 +24,17 @@ public class PlayerData : ScriptableObject
     [Range(0f, 1f)]
     public float jumpCutMultiplier = 0.5f;
 
+    [Header("Jump Assist")]
+    [Tooltip("Coyote time in seconds: lets jump still trigger shortly after leaving ground. "
+           + "Celeste-style defaults are around 0.10s.")]
+    [Min(0f)]
+    public float coyoteTime = 0.10f;
+
+    [Tooltip("Jump input buffer in seconds: stores jump pressed slightly before landing. "
+           + "Common range is ~0.08-0.12s.")]
+    [Min(0f)]
+    public float jumpBufferTime = 0.10f;
+
     [Header("Gravity")]
     [Tooltip("Gravity multiplier when falling (> 1 makes the player fall faster than they rise).")]
     public float fallGravityMultiplier = 1.5f;
